@@ -1,4 +1,4 @@
-package VanillaWave;
+package VanillaWaveEngine.Input;
 
 import static org.lwjgl.glfw.GLFW.*;
 

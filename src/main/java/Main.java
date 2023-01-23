@@ -1,4 +1,4 @@
-import VanillaWave.Window;
+import VanillaWaveEngine.*;
 
 public class Main {
 
