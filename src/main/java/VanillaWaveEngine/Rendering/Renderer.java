@@ -2,7 +2,7 @@ package VanillaWaveEngine.Rendering;
 
 import VanillaWaveEngine.Camera;
 import VanillaWaveEngine.Math.Matrix4f;
-import VanillaWaveEngine.Object;
+import VanillaWaveEngine.Entity;
 import VanillaWaveEngine.Window;
 import org.lwjgl.opengl.*;
 
@@ -18,15 +18,15 @@ public class Renderer {
 
     }
 
-    public void renderMesh(Object object, Camera camera) {
-        GL30.glBindVertexArray(object.getMesh().getVAO());
+    public void renderMesh(Entity entity, Camera camera) {
+        GL30.glBindVertexArray(entity.getMesh().getVAO());
         GL30.glEnableVertexAttribArray(0);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, object.getMesh().getIBO());
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, entity.getMesh().getIBO());
         shader.bind();
-        shader.setUniform("model", Matrix4f.transform(object.getPosition(), object.getRotation(), object.getScale()));
+        shader.setUniform("model", Matrix4f.transform(entity.getPosition(), entity.getRotation(), entity.getScale()));
         shader.setUniform("view", Matrix4f.view(camera.getPosition(), camera.getRotation()));
         shader.setUniform("projection", window.getProjectionMatrix());
-        GL11.glDrawElements(GL11.GL_TRIANGLES, object.getMesh().getIndices().length, GL11.GL_UNSIGNED_INT, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, entity.getMesh().getIndices().length, GL11.GL_UNSIGNED_INT, 0);
         shader.unbind();
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL30.glDisableVertexAttribArray(0);

@@ -10,7 +10,7 @@ import java.nio.IntBuffer;
 public class Mesh {
 
     // Vertex is each part of the triangle
-    private Vertex[] vertices;
+    public Vertex[] vertices;
 
     // Indices is the order in which to draw each vertex
     private int[] indices;

@@ -6,11 +6,11 @@ import VanillaWaveEngine.Input.KeyboardListener;
 import VanillaWaveEngine.Input.MouseListener;
 import VanillaWaveEngine.Math.Matrix4f;
 import VanillaWaveEngine.Math.Vector3f;
-import VanillaWaveEngine.Math.Vertex;
-import VanillaWaveEngine.Rendering.Mesh;
 import VanillaWaveEngine.Rendering.Renderer;
 import VanillaWaveEngine.Rendering.Shader;
-import org.lwjgl.*;
+import Main.CubeMesh;
+
+import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
@@ -28,30 +28,27 @@ public class Window {
     private long window;
 
     private float red, green, blue, alpha;
-    private boolean fadeToBlack;
+
+    private float temp, tempOrbit, temp2;
 
     private Renderer renderer;
     private Matrix4f projection;
 
-    Camera camera = new Camera(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
+    public int frames;
+    public double frameLimit = 60.0;
+    public long time;
 
-    public Mesh mesh = new Mesh(new Vertex[] {
+    CubeMesh cube = new CubeMesh();
 
-            new Vertex(new Vector3f(-0.5f, 0.5f, 0.0f)),
-            new Vertex(new Vector3f(0.5f, 0.5f, 0.0f)),
-            new Vertex(new Vector3f(0.5f, -0.5f, 0.0f)),
-            new Vertex(new Vector3f(-0.5f, -0.5f, 0.0f))
+    public Camera camera = new Camera(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
 
-    }, new int[] {
+    public Entity cube_render = new Entity(new Vector3f(2.5f, 2.5f, 2.5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
+    public Entity cube_render2 = new Entity(new Vector3f(5f, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
+    public Entity cube_render3 = new Entity(new Vector3f(0, 0, 5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
+    public Entity center = new Entity(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
+    public Entity orbit = new Entity(new Vector3f(0, 1, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
 
-            0, 1, 2,
-            0, 3, 2
-
-    });
-
-    public Object object = new Object(new Vector3f(0, 0, 1), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), mesh);
-
-    private Window() {
+    public Window() {
 
         System.out.println("The current version of LWJGL is " + Version.getVersion());
 
@@ -113,13 +110,13 @@ public class Window {
         }
 
         // Configure the GLFW window
-        GLFWConfig();
+        VanillaWaveDefaultConfig();
 
         // Create the window
-        window = glfwCreateWindow(this.width/2, this.height/2, this.title, NULL, NULL);
+        window = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), NULL);
 
         // Sets the position of the window to the middle of the screen
-        glfwSetWindowPos(window, this.width/4, this.height/4);
+        glfwSetWindowPos(window, width/4, height/4);
 
         if ( window == NULL ) {
 
@@ -132,6 +129,9 @@ public class Window {
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
+
+        // Set up time
+        time = System.currentTimeMillis();
 
         // Enable v-sync
         glfwSwapInterval(1);
@@ -146,7 +146,7 @@ public class Window {
         // bindings available for use.
         GL.createCapabilities();
 
-        projection = Matrix4f.projection(70.0f, (float) width / (float) height, 0.1f, 1000.0f);
+        projection = Matrix4f.projection(90.0f, (float) width / (float) height, 0.1f, 1000.0f);
 
         Shader shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
 
@@ -157,7 +157,7 @@ public class Window {
         shader.create();
 
         // Creates the mesh before the program renders the mesh
-        mesh.create();
+        cube.create();
 
     }
 
@@ -167,11 +167,24 @@ public class Window {
         // the window or has pressed the ESCAPE key.
         while ( !glfwWindowShouldClose(window) ) {
 
+            // Measure speed
+            frames++;
+            if (System.currentTimeMillis() > time + 1000) {
+
+                System.out.println(frames);
+                time = System.currentTimeMillis();
+                frames = 0;
+
+            }
+
             // Updates the position of the camera everytime the while loop is run
             camera.update();
 
             // Updates the object position and rotation
-            object.update();
+            updateCube1();
+            updateCube2();
+            updateCube3();
+            updateOrbit();
 
             // Renders the square created in the mesh
             render();
@@ -181,20 +194,6 @@ public class Window {
 
             // clear the framebuffer
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            if (fadeToBlack) {
-
-                red = Math.max(red - 0.01f, 0);
-                green = Math.max(green - 0.01f, 0);
-                blue = Math.max(blue - 0.01f, 0);
-
-            }
-
-            if (KeyboardListener.isKeyPressed(GLFW_KEY_P)) {
-
-                fadeToBlack = true;
-
-            }
 
             // Destroys the window and terminates the program without an error
             if (KeyboardListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
@@ -216,15 +215,20 @@ public class Window {
                 glfwSetWindowMonitor(
                         (window),
                         (isFullscreen ? NULL : glfwGetPrimaryMonitor()),
-                        (isFullscreen ? width/4 : 0),
-                        (isFullscreen ? height/4 : 0),
-                        (isFullscreen ? width/2 : width),
-                        (isFullscreen ? height/2 : height),
+                        (isFullscreen ? this.width/4 : 0),
+                        (isFullscreen ? this.height/4 : 0),
+                        (isFullscreen ? this.width/2 : this.width),
+                        (isFullscreen ? this.height/2 : this.height),
                         (GLFW_DONT_CARE));
+
+                // Enable v-sync
+                glfwSwapInterval(1);
 
                 if (isFullscreen) {
 
                     isFullscreen = false;
+
+
 
                 }
                 else if (!isFullscreen) {
@@ -249,21 +253,33 @@ public class Window {
                 }
 
             }
+            if (isFullscreen) {
+
+                double lastTime = glfwGetTime();
+                while (glfwGetTime() < lastTime + 1.0/frameLimit) {
+
+                }
+
+            }
 
             // Toggleable mouse lock
-
-            glfwSetInputMode(window, GLFW_CURSOR, ( MouseListener.buttonPressedDown(GLFW_MOUSE_BUTTON_LEFT) ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL));
-
+            glfwSetInputMode(window, GLFW_CURSOR, (MouseListener.buttonPressedDown(GLFW_MOUSE_BUTTON_LEFT) ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL));
 
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents();
+
+
         }
     }
 
     public void render() {
 
-        renderer.renderMesh(object, camera);
+        renderer.renderMesh(cube_render, camera);
+        renderer.renderMesh(cube_render2, camera);
+        renderer.renderMesh(cube_render3, camera);
+        renderer.renderMesh(center, camera);
+        renderer.renderMesh(orbit, camera);
         GLFW.glfwSwapBuffers(window);
 
     }
@@ -277,7 +293,7 @@ public class Window {
 
     }
 
-    private void GLFWConfig() {
+    private void VanillaWaveDefaultConfig() {
 
         glfwDefaultWindowHints(); // The window will have the default hints
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // The window will stay hidden after creation
@@ -289,6 +305,37 @@ public class Window {
     public Matrix4f getProjectionMatrix() {
 
         return projection;
+
+    }
+
+    public void updateCube1() {
+
+        temp += 0.01f;
+        temp2 += 0.001f;
+
+        cube_render.updateXRotation((float) Math.sin(temp)*90);
+        cube_render.updateZPosition((float) Math.sin(temp));
+
+    }
+
+    public void updateCube2() {
+
+        cube_render2.updateXPosition(camera.getPosition().getX());
+
+    }
+
+    public void updateCube3() {
+
+        cube_render3.updateYPosition(camera.getPosition().getY());
+
+    }
+
+    public void updateOrbit() {
+
+        tempOrbit += 1f;
+
+        orbit.updateXRotation(tempOrbit);
+
 
     }
 
