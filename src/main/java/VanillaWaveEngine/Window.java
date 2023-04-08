@@ -1,63 +1,52 @@
 package VanillaWaveEngine;
 
 import java.lang.Thread;
+import java.nio.IntBuffer;
 
 import VanillaWaveEngine.Input.KeyboardListener;
 import VanillaWaveEngine.Input.MouseListener;
 import VanillaWaveEngine.Math.Matrix4f;
-import VanillaWaveEngine.Math.Vector3f;
-import VanillaWaveEngine.Rendering.Renderer;
 import VanillaWaveEngine.Rendering.Shader;
-import Main.CubeMesh;
 
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
+import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class Window {
+public class Window extends Main.Main {
 
     private final int width, height;
     private final String title;
     private boolean isFullscreen;
-    private static Window windowPresent = null;
-    private long window;
+    public static long window;
 
     private float red, green, blue, alpha;
 
-    private float temp, tempOrbit, temp2;
-
-    private Renderer renderer;
     private Matrix4f projection;
+
+    Shader shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
 
     public int frames;
     public double frameLimit = 60.0;
     public long time;
 
-    CubeMesh cube = new CubeMesh();
+    public Window(int width, int height, String title) {
 
-    public Camera camera = new Camera(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
-
-    public Entity cube_render = new Entity(new Vector3f(2.5f, 2.5f, 2.5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
-    public Entity cube_render2 = new Entity(new Vector3f(5f, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
-    public Entity cube_render3 = new Entity(new Vector3f(0, 0, 5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
-    public Entity center = new Entity(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
-    public Entity orbit = new Entity(new Vector3f(0, 1, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
-
-    public Window() {
-
+        // Get LWJGL 3 Version
         System.out.println("The current version of LWJGL is " + Version.getVersion());
 
         // Sets the size of the start-up window
-        this.width = 1920;
-        this.height = 1080;
+        this.width = width;
+        this.height = height;
 
         // Sets the title of the window
-        this.title = "Window Thing";
+        this.title = title;
 
         // Sets the rgba of the screen background
         red = 1f;
@@ -67,24 +56,13 @@ public class Window {
 
         this.isFullscreen = false;
 
-    }
-
-    public static Window get() {
-
-        // Makes sure there is only 1 window created
-        if(Window.windowPresent == null) {
-
-            Window.windowPresent = new Window();
-
-        }
-
-        return Window.windowPresent;
+        // Set up projection matrix
+        projection = Matrix4f.projection(90.0f, (float) 1920 / (float) 1080, 0.1f, 1000.0f);
 
     }
 
     public void run() {
 
-        init();
         loop();
 
         // Free the window callbacks and destroy the window
@@ -97,7 +75,7 @@ public class Window {
 
     }
 
-    private void init() {
+    public void init() {
 
         // Setup an error callback.
         GLFWErrorCallback.createPrint(System.err).set();
@@ -113,10 +91,25 @@ public class Window {
         VanillaWaveDefaultConfig();
 
         // Create the window
-        window = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), NULL);
+        window = glfwCreateWindow(this.width, this.height, this.title, glfwGetPrimaryMonitor(), NULL);
 
-        // Sets the position of the window to the middle of the screen
-        glfwSetWindowPos(window, width/4, height/4);
+        try (MemoryStack stack = stackPush()) {
+
+            IntBuffer pWidth = stack.mallocInt(1);
+            IntBuffer pHeight = stack.mallocInt(1);
+
+            // Get the window size passed to glfwCreateWindow
+            glfwGetWindowSize(window, pWidth, pHeight);
+
+            // Get the resolution of the primary monitor
+            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+            // Sets the position of the window to the middle of the screen
+            glfwSetWindowPos(window,
+                    (vidmode.width() - pWidth.get(0)) / 4,
+                    (vidmode.height() - pHeight.get(0)) / 4);
+
+        }
 
         if ( window == NULL ) {
 
@@ -146,26 +139,9 @@ public class Window {
         // bindings available for use.
         GL.createCapabilities();
 
-        projection = Matrix4f.projection(90.0f, (float) width / (float) height, 0.1f, 1000.0f);
-
-        Shader shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
-
-        // Sets up the renderer to use the shader
-        renderer = new Renderer(this, shader);
-
-        // Creates the shader before the program renders the shader
-        shader.create();
-
-        // Creates the mesh before the program renders the mesh
-        cube.create();
-
     }
 
-    private void loop() {
-
-        // Run the rendering loop until the user has attempted to close
-        // the window or has pressed the ESCAPE key.
-        while ( !glfwWindowShouldClose(window) ) {
+    public void loop() {
 
             // Measure speed
             frames++;
@@ -177,18 +153,6 @@ public class Window {
 
             }
 
-            // Updates the position of the camera everytime the while loop is run
-            camera.update();
-
-            // Updates the object position and rotation
-            updateCube1();
-            updateCube2();
-            updateCube3();
-            updateOrbit();
-
-            // Renders the square created in the mesh
-            render();
-
             // Set the clear color
             glClearColor(red, green, blue, alpha);
 
@@ -197,8 +161,6 @@ public class Window {
 
             // Destroys the window and terminates the program without an error
             if (KeyboardListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
-
-                Shader shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
 
                 shader.destroy();
 
@@ -227,8 +189,6 @@ public class Window {
                 if (isFullscreen) {
 
                     isFullscreen = false;
-
-
 
                 }
                 else if (!isFullscreen) {
@@ -269,19 +229,6 @@ public class Window {
             // invoked during this call.
             glfwPollEvents();
 
-
-        }
-    }
-
-    public void render() {
-
-        renderer.renderMesh(cube_render, camera);
-        renderer.renderMesh(cube_render2, camera);
-        renderer.renderMesh(cube_render3, camera);
-        renderer.renderMesh(center, camera);
-        renderer.renderMesh(orbit, camera);
-        GLFW.glfwSwapBuffers(window);
-
     }
 
     private void GLFWCallbacks() {
@@ -308,34 +255,9 @@ public class Window {
 
     }
 
-    public void updateCube1() {
+    public static void swapBuffer() {
 
-        temp += 0.01f;
-        temp2 += 0.001f;
-
-        cube_render.updateXRotation((float) Math.sin(temp)*90);
-        cube_render.updateZPosition((float) Math.sin(temp));
-
-    }
-
-    public void updateCube2() {
-
-        cube_render2.updateXPosition(camera.getPosition().getX());
-
-    }
-
-    public void updateCube3() {
-
-        cube_render3.updateYPosition(camera.getPosition().getY());
-
-    }
-
-    public void updateOrbit() {
-
-        tempOrbit += 1f;
-
-        orbit.updateXRotation(tempOrbit);
-
+        GLFW.glfwSwapBuffers(window);
 
     }
 
