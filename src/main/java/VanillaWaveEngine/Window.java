@@ -233,10 +233,10 @@ public class Window extends Main.Main {
 
     private void GLFWCallbacks() {
 
-        glfwSetCursorPosCallback(window, MouseListener::mousePosCallback);
-        glfwSetScrollCallback(window, MouseListener::mouseScrollCallback);
-        glfwSetMouseButtonCallback(window, MouseListener::mouseButtonCallback);
-        glfwSetKeyCallback(window, KeyboardListener::keyCallback);
+        glfwSetCursorPosCallback(window, MouseListener::mousePosCallback); // Get mouse position
+        glfwSetScrollCallback(window, MouseListener::mouseScrollCallback); // Get mouse scroll position
+        glfwSetMouseButtonCallback(window, MouseListener::mouseButtonCallback); // Get mouse button
+        glfwSetKeyCallback(window, KeyboardListener::keyCallback); // Get keyboard button
 
     }
 
@@ -257,8 +257,20 @@ public class Window extends Main.Main {
 
     public static void swapBuffer() {
 
+        // Refresh positions
         GLFW.glfwSwapBuffers(window);
 
     }
 
+    public void terminate() {
+
+        // Free the window callbacks and destroy the window
+        glfwFreeCallbacks(windowObject.window);
+        glfwDestroyWindow(windowObject.window);
+
+        // Terminate GLFW and free the error callback
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
+
+    }
 }

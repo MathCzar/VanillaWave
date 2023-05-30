@@ -1,5 +1,6 @@
 package Main;
 
+import VanillaWaveEngine.Math.Vector2f;
 import VanillaWaveEngine.Math.Vector3f;
 import VanillaWaveEngine.Math.Vertex;
 import VanillaWaveEngine.Rendering.Mesh;
@@ -14,42 +15,106 @@ public class CubeMesh {
 
     public Mesh meshCube = new Mesh(new Vertex[] {
 
-            //vertexes
-            /* 0 */ new Vertex(new Vector3f(-0.5f, -0.5f, -0.5f)),
-            /* 1 */ new Vertex(new Vector3f(-0.5f, 0.5f, -0.5f)),
-            /* 2 */ new Vertex(new Vector3f(0.5f, 0.5f, -0.5f)),
-            /* 3 */ new Vertex(new Vector3f(0.5f, -0.5f, -0.5f)),
-            /* 4 */ new Vertex(new Vector3f(-0.5f, -0.5f, 0.5f)),
-            /* 5 */ new Vertex(new Vector3f(-0.5f, 0.5f, 0.5f)),
-            /* 6 */ new Vertex(new Vector3f(0.5f, 0.5f, 0.5f)),
-            /* 7 */ new Vertex(new Vector3f(0.5f, -0.5f, 0.5f)),
+            //Back face
+            new Vertex(new Vector3f(-0.5f,  0.5f, -0.5f)),
+            new Vertex(new Vector3f(-0.5f, -0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f, -0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f,  0.5f, -0.5f)),
 
+            //Front face
+            new Vertex(new Vector3f(-0.5f,  0.5f,  0.5f)),
+            new Vertex(new Vector3f(-0.5f, -0.5f,  0.5f)),
+            new Vertex(new Vector3f( 0.5f, -0.5f,  0.5f)),
+            new Vertex(new Vector3f( 0.5f,  0.5f,  0.5f)),
+
+            //Right face
+            new Vertex(new Vector3f( 0.5f,  0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f, -0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f, -0.5f,  0.5f)),
+            new Vertex(new Vector3f( 0.5f,  0.5f,  0.5f)),
+
+            //Left face
+            new Vertex(new Vector3f(-0.5f,  0.5f, -0.5f)),
+            new Vertex(new Vector3f(-0.5f, -0.5f, -0.5f)),
+            new Vertex(new Vector3f(-0.5f, -0.5f,  0.5f)),
+            new Vertex(new Vector3f(-0.5f,  0.5f,  0.5f)),
+
+            //Top face
+            new Vertex(new Vector3f(-0.5f,  0.5f,  0.5f)),
+            new Vertex(new Vector3f(-0.5f,  0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f,  0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f,  0.5f,  0.5f)),
+
+            //Bottom face
+            new Vertex(new Vector3f(-0.5f, -0.5f,  0.5f)),
+            new Vertex(new Vector3f(-0.5f, -0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f, -0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f, -0.5f,  0.5f)),
+
+
+    }, new Vertex[] {
+
+            //Back face
+            new Vertex(new Vector2f(0.0f, 0.0f)),
+            new Vertex(new Vector2f(0.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 0.0f)),
+
+            //Front face
+            new Vertex(new Vector2f(0.0f, 0.0f)),
+            new Vertex(new Vector2f(0.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 0.0f)),
+
+            //Right face
+            new Vertex(new Vector2f(0.0f, 0.0f)),
+            new Vertex(new Vector2f(0.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 0.0f)),
+
+            //Left face
+            new Vertex(new Vector2f(0.0f, 0.0f)),
+            new Vertex(new Vector2f(0.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 0.0f)),
+
+            //Top face
+            new Vertex(new Vector2f(0.0f, 0.0f)),
+            new Vertex(new Vector2f(0.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 0.0f)),
+
+            //Bottom face
+            new Vertex(new Vector2f(0.0f, 0.0f)),
+            new Vertex(new Vector2f(0.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 0.0f))
 
     }, new int[] {
 
-            //front face
-            0, 1, 2,
-            0, 3, 2,
+            //Back face
+            0, 1, 3,
+            3, 1, 2,
 
-            //back face
-            4, 5, 6,
-            4, 7, 6,
+            //Front face
+            4, 5, 7,
+            7, 5, 6,
 
-            //right face
-            7, 6, 2,
-            7, 3, 2,
+            //Right face
+            8, 9, 11,
+            11, 9, 10,
 
-            //left face
-            4, 5, 1,
-            4, 0, 1,
+            //Left face
+            12, 13, 15,
+            15, 13, 14,
 
-            //top face
-            1, 5, 6,
-            1, 2, 6,
+            //Top face
+            16, 17, 19,
+            19, 17, 18,
 
-            // bottom face
-            0, 4, 7,
-            0, 3, 7
+            //Bottom face
+            20, 21, 23,
+            23, 21, 22
 
     });
 

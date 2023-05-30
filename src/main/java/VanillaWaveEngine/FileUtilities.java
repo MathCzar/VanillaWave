@@ -1,9 +1,12 @@
 package VanillaWaveEngine;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.lwjgl.system.MemoryUtil;
+
+import javax.swing.text.Utilities;
+import java.io.*;
+import java.nio.FloatBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class FileUtilities {
 
@@ -30,6 +33,14 @@ public class FileUtilities {
         }
 
         return result.toString();
+
+    }
+
+    public static FloatBuffer storeDataInFloatBuffer(float[] data) {
+
+        FloatBuffer buffer = MemoryUtil.memAllocFloat(data.length);
+        buffer.put(data).flip();
+        return buffer;
 
     }
 

@@ -4,9 +4,11 @@ import VanillaWaveEngine.*;
 import VanillaWaveEngine.Math.Vector3f;
 import VanillaWaveEngine.Rendering.Renderer;
 import VanillaWaveEngine.Rendering.Shader;
+import VanillaWaveEngine.Rendering.Texture;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Main implements Runnable {
 
@@ -54,13 +56,7 @@ public class Main implements Runnable {
         // Cycle through the game
         loop();
 
-        // Free the window callbacks and destroy the window
-        glfwFreeCallbacks(windowObject.window);
-        glfwDestroyWindow(windowObject.window);
-
-        // Terminate GLFW and free the error callback
-        glfwTerminate();
-        glfwSetErrorCallback(null).free();
+        windowObject.terminate();
 
     }
 
@@ -79,6 +75,8 @@ public class Main implements Runnable {
 
         // Creates the mesh before the program renders the mesh
         cube.create();
+
+        glEnable(GL_DEPTH_TEST);
 
     }
 
@@ -102,6 +100,7 @@ public class Main implements Runnable {
 
             // Renders the square created in the mesh
             render();
+            glViewport(0, 0, width, height);
 
         }
 

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="java">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../Downloads/StbImageJava-master/StbImageJava-master/sample/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../Downloads/StbImageJava-master/StbImageJava-master/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../Downloads/StbImageJava-master/StbImageJava-master/testing/src/main/java" />
+    </SOURCES>
+  </library>
+</component>
