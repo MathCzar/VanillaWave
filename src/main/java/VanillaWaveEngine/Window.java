@@ -19,12 +19,14 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class Window extends Main.Main {
+public class Window {
 
     private final int width, height;
     private final String title;
     private boolean isFullscreen;
     public static long window;
+
+    private Main.Main main;
 
     private float red, green, blue, alpha;
 
@@ -33,10 +35,10 @@ public class Window extends Main.Main {
     Shader shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
 
     public int frames;
-    public double frameLimit = 60.0;
+    public double frameLimit = 144.0;
     public long time;
 
-    public Window(int width, int height, String title) {
+    public Window(int width, int height, String title, Main.Main main) {
 
         // Get LWJGL 3 Version
         System.out.println("The current version of LWJGL is " + Version.getVersion());
@@ -47,6 +49,8 @@ public class Window extends Main.Main {
 
         // Sets the title of the window
         this.title = title;
+
+        this.main = main;
 
         // Sets the rgba of the screen background
         red = 1f;
@@ -167,6 +171,7 @@ public class Window extends Main.Main {
                 glfwDestroyWindow(window);
 
                 glfwTerminate();
+
                 System.exit(0);
 
             }
@@ -265,8 +270,8 @@ public class Window extends Main.Main {
     public void terminate() {
 
         // Free the window callbacks and destroy the window
-        glfwFreeCallbacks(windowObject.window);
-        glfwDestroyWindow(windowObject.window);
+        glfwFreeCallbacks(main.windowObject.window);
+        glfwDestroyWindow(main.windowObject.window);
 
         // Terminate GLFW and free the error callback
         glfwTerminate();

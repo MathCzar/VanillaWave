@@ -4,13 +4,13 @@ import java.util.*;
 
 public class TextureCache {
 
-    public static final String DEFAULT_TEXTURE = "resources/textures/grassBlock.png";
+    public String DEFAULT_TEXTURE_PATH;
 
     private Map<String, Texture> textureMap;
 
-    public TextureCache() {
+    public TextureCache(String DEFAULT_TEXTURE_PATH, Texture DEFAULT_TEXTURE) {
         textureMap = new HashMap<>();
-        textureMap.put(DEFAULT_TEXTURE, new Texture(DEFAULT_TEXTURE));
+        textureMap.put(DEFAULT_TEXTURE_PATH, DEFAULT_TEXTURE);
     }
 
     public Texture createTexture(String texturePath) {
@@ -23,7 +23,7 @@ public class TextureCache {
             texture = textureMap.get(texturePath);
         }
         if (texture == null) {
-            texture = textureMap.get(DEFAULT_TEXTURE);
+            texture = textureMap.get(DEFAULT_TEXTURE_PATH);
         }
         return texture;
     }

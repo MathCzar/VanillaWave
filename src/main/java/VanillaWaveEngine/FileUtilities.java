@@ -5,8 +5,6 @@ import org.lwjgl.system.MemoryUtil;
 import javax.swing.text.Utilities;
 import java.io.*;
 import java.nio.FloatBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 public class FileUtilities {
 
@@ -26,6 +24,7 @@ public class FileUtilities {
             }
 
         } catch (IOException e) {
+            System.out.println(e);
 
             System.err.println("Could not find the file at " + path);
 

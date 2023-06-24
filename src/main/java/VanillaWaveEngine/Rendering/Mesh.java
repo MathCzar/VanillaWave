@@ -1,5 +1,6 @@
 package VanillaWaveEngine.Rendering;
 
+import VanillaWaveEngine.Entity;
 import VanillaWaveEngine.Math.Vertex;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryUtil;
@@ -13,7 +14,8 @@ import static org.lwjgl.opengl.GL20.*;
 
 public class Mesh {
 
-    private Texture texture;
+    //private String texturePath;
+    //private Texture texture;
 
     // Vertex is each part of the triangle
     public Vertex[] vertices;
@@ -27,6 +29,7 @@ public class Mesh {
     // VAO - Vertex Array Object
     // PBO - Position Buffer Object
     // IBO - Indices Buffer Object
+    // TBO - Texture Buffer Object
     private int VAO, PBO, TBO, IBO;
 
     public Mesh(Vertex[] vertices, Vertex[] textureCoords, int[] indices) {
@@ -39,7 +42,16 @@ public class Mesh {
 
     public void create() {
 
-        texture = new Texture("src/main/resources/textures/grassBlock.png");
+//        switch(Entity.getID()){
+//
+//            case 0:
+//                texture = new Texture("src/main/resources/textures/wood.png");
+//                break;
+//            case 1:
+//                texture = new Texture("src/main/resources/textures/grassBlock.png");
+//                break;
+//
+//        }
 
         // Generates a VAO
         VAO = GL30.glGenVertexArrays();
@@ -133,10 +145,10 @@ public class Mesh {
 
     }
 
-    public Texture getTexture() {
-
-        return texture;
-
-    }
+    //public Texture getTexture() {
+//
+    //    return texture;
+//
+    //}
 
 }

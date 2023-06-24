@@ -1,9 +1,13 @@
 package VanillaWaveEngine.Rendering;
 
+import VanillaWaveEngine.Entity;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.*;
 
+import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.*;
 
@@ -38,10 +42,12 @@ public class Texture {
         }
     }
 
-    public void bind() {
+    public void bind(Entity entity) {
+        glBindTexture(GL_TEXTURE_2D, entity.getTextureID());
+    }
 
-        glBindTexture(GL_TEXTURE_2D, textureId);
-
+    public void cleanup() {
+        glDeleteTextures(textureId);
     }
 
     private void generateTexture(int width, int height, ByteBuffer buf) {
@@ -56,15 +62,7 @@ public class Texture {
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 
-    public int getTextureId() {
-
-        return textureId;
-
-    }
-
     public String getTexturePath() {
-
         return texturePath;
-
     }
 }

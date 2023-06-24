@@ -3,9 +3,17 @@ package VanillaWaveEngine;
 import VanillaWaveEngine.Input.KeyboardListener;
 import VanillaWaveEngine.Input.MouseListener;
 import VanillaWaveEngine.Math.Vector3f;
+import VanillaWaveEngine.Math.Matrix4f;
+import VanillaWaveEngine.Rendering.Model;
+import VanillaWaveEngine.Rendering.TextureCache;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Camera {
+
+    private final Matrix4f viewMatrix = new Matrix4f();
 
     private Vector3f position, rotation;
     private float moveSpeed = 0.05f, mouseSensitivity = 0.15f;
@@ -78,6 +86,12 @@ public class Camera {
 
     public Vector3f getRotation() {
         return rotation;
+    }
+
+    public Matrix4f getViewMatrix() {
+
+        return viewMatrix;
+
     }
 
 }
