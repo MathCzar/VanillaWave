@@ -1,8 +1,6 @@
 package VanillaWaveEngine.Rendering;
 
 import VanillaWaveEngine.Entity;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL11C;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.*;
@@ -15,6 +13,8 @@ public class Texture {
 
     private int textureId;
     private String texturePath;
+
+    private int width, height;
 
     public Texture(int width, int height, ByteBuffer buf) {
         this.texturePath = "";
@@ -33,8 +33,8 @@ public class Texture {
                 throw new RuntimeException("Image file [" + texturePath + "] not loaded: " + stbi_failure_reason());
             }
 
-            int width = w.get();
-            int height = h.get();
+            this.width = w.get();
+            this.height = h.get();
 
             generateTexture(width, height, buf);
 
@@ -44,6 +44,10 @@ public class Texture {
 
     public void bind(Entity entity) {
         glBindTexture(GL_TEXTURE_2D, entity.getTextureID());
+    }
+
+    public void bindText(TextItem text) {
+        glBindTexture(GL_TEXTURE_2D, 4);
     }
 
     public void cleanup() {
@@ -65,4 +69,13 @@ public class Texture {
     public String getTexturePath() {
         return texturePath;
     }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
 }

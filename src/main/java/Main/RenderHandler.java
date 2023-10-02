@@ -3,10 +3,7 @@ package Main;
 import VanillaWaveEngine.Camera;
 import VanillaWaveEngine.Entity;
 import VanillaWaveEngine.Math.Vector3f;
-import VanillaWaveEngine.Rendering.Material;
-import VanillaWaveEngine.Rendering.Model;
-import VanillaWaveEngine.Rendering.Scene;
-import VanillaWaveEngine.Rendering.Texture;
+import VanillaWaveEngine.Rendering.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,21 +13,32 @@ public class RenderHandler {
     public Camera camera = new Camera(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
 
     CubeMesh cube = new CubeMesh();
+    FaceMesh face = new FaceMesh();
+
+    TextItem FPSCounter;
+
+    Texture woodTexture;
+    Texture grassTexture;
+
+    Texture font;
 
     //public Entity cube_render = new Entity(new Vector3f(2.5f, 2.5f, 2.5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
     //public Entity cube_render2 = new Entity(new Vector3f(5f, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
     //public Entity cube_render3 = new Entity(new Vector3f(0, 0, 5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
     public Entity center = new Entity(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 2, "cube-model");
     public Entity orbit = new Entity(new Vector3f(10, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 2, "cube-model");
-    public Entity orbit2 = new Entity(new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 3, "cube-model");
+    public Entity orbit2 = new Entity(new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 2, "cube-model");
     public Entity orbit3 = new Entity(new Vector3f(0, 0, 10), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 3, "cube-model");
     public Entity orbit4 = new Entity(new Vector3f(0, 5, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 3, "cube-model");
+    public Entity faceEntity = new Entity(new Vector3f(5, 5, 5), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), face.faceMesh, 3, "face-model");
 
     private float temp, temp2, tempOrbitAngle = 0, tempOrbitX, tempOrbitZ, tempOrbitY, gameCycle = 0, tempOrbitX2, tempOrbitZ2, tempOrbitY2, tempOrbitAngle2 = 0;
 
     private int sphereResolution = 2;
 
-    private Model model;
+    private Model cubeModel, faceModel;
+
+    private Model fontModel;
 
     private final Scene scene;
 
@@ -43,13 +51,27 @@ public class RenderHandler {
     public void createMeshes() {
 
         cube.create();
+        face.create();
+
+    }
+
+    private void createTextures() {
+
+        woodTexture = scene.getTextureCache().createTexture("src/main/resources/textures/materials/wood.png");
+        grassTexture = scene.getTextureCache().createTexture("src/main/resources/textures/materials/grassBlock.png");
+
+    }
+
+    private void createFontTextures() {
+
+        font = scene.getFontCache().createFont("src/main/resources/textures/fonts/ExportedFont.png");
 
     }
 
     public void createMaterials() {
 
-        Texture woodTexture = scene.getTextureCache().createTexture("src/main/resources/textures/wood.png");
-        Texture grassTexture = scene.getTextureCache().createTexture("src/main/resources/textures/grassBlock.png");
+        createTextures();
+
         Material wood = new Material();
         Material grass = new Material();
         wood.setTexturePath(woodTexture.getTexturePath());
@@ -58,12 +80,29 @@ public class RenderHandler {
         materialList.add(wood);
         materialList.add(grass);
 
-        model = new Model("cube", materialList);
-
-        wood.getMeshList().add(cube.meshCube);
-        grass.getMeshList().add(cube.meshCube);
-        Model cubeModel = new Model("cube-model", materialList);
+        cubeModel = new Model("cube-model", materialList, cube.meshCube);
+        faceModel = new Model("face-model", materialList, face.faceMesh);
         scene.addModel(cubeModel);
+        scene.addModel(faceModel);
+
+    }
+
+    public void createFonts() {
+
+        createFontTextures();
+
+        Material fontMaterial = new Material();
+        fontMaterial.setTexturePath(font.getTexturePath());
+        List<Material> fontList = new ArrayList<>();
+        fontList.add(fontMaterial);
+
+        FPSCounter = new TextItem("", scene.getFontCache().getFont("src/main/resources/textures/fonts/ExportedFont.png"), 4, 8, 8, new Vector3f(-1.75f, 0.825f, -1.0f), new Vector3f(0, 0, 0), new Vector3f(0.5f, 0.5f, 0.5f));
+
+        List<TextItem> textEntityList = new ArrayList<>();
+
+        textEntityList.add(FPSCounter);
+
+        fontModel = new Model("font", fontList, FPSCounter.getMesh(), textEntityList);
 
     }
 
@@ -74,6 +113,7 @@ public class RenderHandler {
         scene.addEntity(orbit2);
         scene.addEntity(orbit3);
         scene.addEntity(orbit4);
+        scene.addEntity(faceEntity);
 
     }
 
@@ -182,6 +222,12 @@ public class RenderHandler {
 //        orbit3.updateYPosition(0);
 //        orbit4.updateXPosition(0);
 //        orbit4.updateYPosition(-0.5f);
+
+    }
+
+    public Model getTextModel() {
+
+        return fontModel;
 
     }
 

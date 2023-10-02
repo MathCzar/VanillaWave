@@ -1,6 +1,5 @@
 package VanillaWaveEngine.Rendering;
 
-import VanillaWaveEngine.Entity;
 import VanillaWaveEngine.Math.Vertex;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryUtil;
@@ -26,32 +25,26 @@ public class Mesh {
     // Texture Coordinates to determine what to show
     private Vertex[] textureCoords;
 
+    // Normals determine the orientation of a polygon's surface
+    private float[] normals;
+
     // VAO - Vertex Array Object
     // PBO - Position Buffer Object
     // IBO - Indices Buffer Object
     // TBO - Texture Buffer Object
-    private int VAO, PBO, TBO, IBO;
+    // VBO - Vertex Buffer Object
+    private int VAO, PBO, TBO, IBO, VBO;
 
-    public Mesh(Vertex[] vertices, Vertex[] textureCoords, int[] indices) {
+    public Mesh(Vertex[] vertices, Vertex[] textureCoords, float[] normals, int[] indices) {
 
         this.vertices = vertices;
         this.textureCoords = textureCoords;
+        this.normals = normals;
         this.indices = indices;
 
     }
 
     public void create() {
-
-//        switch(Entity.getID()){
-//
-//            case 0:
-//                texture = new Texture("src/main/resources/textures/wood.png");
-//                break;
-//            case 1:
-//                texture = new Texture("src/main/resources/textures/grassBlock.png");
-//                break;
-//
-//        }
 
         // Generates a VAO
         VAO = GL30.glGenVertexArrays();
@@ -73,6 +66,15 @@ public class Mesh {
 
         }
         positionBuffer.put(positionData).flip();
+
+        // Vertex normals VBO
+        //VBO = glGenBuffers();
+        //vboIdList.add(VBO);
+        //vecNormalsBuffer = MemoryUtil.memAllocFloat(normals.length);
+        //vecNormalsBuffer.put(normals).flip();
+        //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        //glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
+        //glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
 
         // Generates a PBO
         PBO = GL15.glGenBuffers();
@@ -144,11 +146,5 @@ public class Mesh {
         return IBO;
 
     }
-
-    //public Texture getTexture() {
-//
-    //    return texture;
-//
-    //}
 
 }

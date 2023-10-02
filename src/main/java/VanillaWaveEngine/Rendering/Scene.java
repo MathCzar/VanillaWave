@@ -8,12 +8,18 @@ public class Scene {
 
     private Map<String, Model> modelMap;
     private TextureCache textureCache;
+    private FontCache fontCache;
     private String DEFAULT_TEXTURE_PATH = "src/main/resources/textures/ERROR.png";
+    private Texture DEFAULT_TEXTURE = new Texture(DEFAULT_TEXTURE_PATH);
 
     public Scene() {
+
         modelMap = new HashMap<>();
 
-        textureCache = new TextureCache(DEFAULT_TEXTURE_PATH, new Texture(DEFAULT_TEXTURE_PATH));
+        textureCache = new TextureCache(DEFAULT_TEXTURE_PATH, DEFAULT_TEXTURE);
+
+        fontCache = new FontCache(DEFAULT_TEXTURE_PATH, DEFAULT_TEXTURE);
+
     }
 
     public void addEntity(Entity entity) {
@@ -35,6 +41,9 @@ public class Scene {
 
     public TextureCache getTextureCache() {
         return textureCache;
+    }
+    public FontCache getFontCache() {
+        return fontCache;
     }
 
 }

@@ -6,17 +6,19 @@ import VanillaWaveEngine.Rendering.Mesh;
 public class Entity {
 
     public Vector3f position, rotation, scale;
-    private final int textureID;
+    private final int textureID, materialID;
     private final String modelID;
     private Mesh mesh;
 
-    public Entity(Vector3f position, Vector3f rotation, Vector3f scale, Mesh mesh, int textureID, String modelID) {
+
+    public Entity(Vector3f position, Vector3f rotation, Vector3f scale, Mesh mesh, int materialID, String modelID) {
 
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
         this.mesh = mesh;
-        this.textureID = textureID;
+        this.textureID = materialID;
+        this.materialID = materialID;
         this.modelID = modelID;
 
     }
@@ -102,6 +104,12 @@ public class Entity {
     public int getTextureID() {
 
         return textureID;
+
+    }
+
+    public int getMaterialID() {
+
+        return materialID;
 
     }
 

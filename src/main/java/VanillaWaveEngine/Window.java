@@ -34,7 +34,7 @@ public class Window {
 
     Shader shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
 
-    public int frames;
+    public int frames, finalFrames;
     public double frameLimit = 144.0;
     public long time;
 
@@ -151,7 +151,7 @@ public class Window {
             frames++;
             if (System.currentTimeMillis() > time + 1000) {
 
-                System.out.println(frames);
+                finalFrames = frames;
                 time = System.currentTimeMillis();
                 frames = 0;
 
@@ -278,4 +278,11 @@ public class Window {
         glfwSetErrorCallback(null).free();
 
     }
+
+    public int getFrames() {
+
+        return finalFrames;
+
+    }
+
 }

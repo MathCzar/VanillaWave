@@ -2,7 +2,6 @@ package VanillaWaveEngine;
 
 import org.lwjgl.system.MemoryUtil;
 
-import javax.swing.text.Utilities;
 import java.io.*;
 import java.nio.FloatBuffer;
 

@@ -90,7 +90,13 @@ public class CubeMesh {
             new Vertex(new Vector2f(1.0f, 1.0f)),
             new Vertex(new Vector2f(1.0f, 0.0f))
 
-    }, new int[] {
+    },
+    new float[] {
+
+            0
+
+    },
+    new int[] {
 
             //Back face
             0, 1, 3,

@@ -1,10 +1,10 @@
 #version 460 core
 
 in vec3 position;
-in vec3 fragColor;
+in vec3 inColor;
 in vec2 texCoord;
 
-out vec3 outColor;
+out vec3 fragColor;
 out vec2 outTextCoord;
 
 uniform mat4 model;
@@ -15,7 +15,7 @@ void main() {
 
     gl_Position = projection * view * model * vec4(position, 1.0);
 
-    outColor = fragColor;
+    fragColor = inColor;
     outTextCoord = texCoord;
 
 }

@@ -17,8 +17,8 @@ public class Main implements Runnable {
 
     private Scene scene;
 
-    private Renderer renderer;
-    private Shader shader;
+    private Renderer objRenderer, txtRenderer;
+    private Shader objShader, txtShader;
 
     public RenderHandler render;
 
@@ -50,20 +50,24 @@ public class Main implements Runnable {
         scene = new Scene();
 
         render = new RenderHandler(scene);
+        render.createMeshes();
         render.createMaterials();
+        render.createFonts();
+
+        render.initializeEntities();
 
         // Creates the mesh before the program renders the mesh
-        render.createMeshes();
-        render.initializeEntities();
-        shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
+        objShader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
+        txtShader = new Shader("src/main/resources/shaders/textVertex.glsl", "src/main/resources/shaders/textFragment.glsl");
+        //skyShader = new Shader("src/main/resources/shaders/skyVertex.glsl", "src/main/resources/shaders/skyFragment.glsl");
 
         // Sets up the renderer to use the shader
-        renderer = new Renderer(windowObject, shader);
+        objRenderer = new Renderer(windowObject, objShader);
+        txtRenderer = new Renderer(windowObject, txtShader);
 
         // Creates the shader before the program renders the shader
-        shader.create();
-
-        glEnable(GL_DEPTH_TEST);
+        objShader.create();
+        txtShader.create();
 
     }
 
@@ -73,7 +77,11 @@ public class Main implements Runnable {
         // the window or has pressed the ESCAPE key.
         while ( !glfwWindowShouldClose(windowObject.window) ) {
 
+            // Updates the window
             windowObject.loop();
+
+            // Updates FPS text
+            render.FPSCounter.setText(String.valueOf(windowObject.getFrames()));
 
             // Updates the object position and rotation
             render.updateMatrix();
@@ -113,7 +121,10 @@ public class Main implements Runnable {
 
     public void render() {
 
-        renderer.renderMesh(render.camera, scene);
+        //render skybox, then objects, then GUI
+        //skyRenderer.renderMesh(scene, render.getSkyModel());
+        objRenderer.renderMesh(render.camera, scene);
+        txtRenderer.renderText(scene, render.getTextModel());
         Window.swapBuffer();
 
     }
