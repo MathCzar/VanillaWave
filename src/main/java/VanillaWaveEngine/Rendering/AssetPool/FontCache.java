@@ -1,4 +1,6 @@
-package VanillaWaveEngine.Rendering;
+package VanillaWaveEngine.Rendering.AssetPool;
+
+import VanillaWaveEngine.Rendering.Texture;
 
 import java.util.HashMap;
 import java.util.Map;

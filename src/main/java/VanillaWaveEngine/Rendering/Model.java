@@ -9,6 +9,7 @@ public class Model {
     private final String id;
     private List<Entity> entitiesList;
     private List<TextItem> textList;
+    private List<Entity> skyList;
     private List<Material> materialList;
     private final Mesh mesh;
 
@@ -26,12 +27,23 @@ public class Model {
         this.mesh = mesh;
     }
 
+    public Model(String id, List<Material> materialList, List<Entity> skyList, Mesh mesh) {
+        this.id = id;
+        this.skyList = skyList;
+        this.materialList = materialList;
+        this.mesh = mesh;
+    }
+
     public List<Entity> getEntitiesList() {
         return entitiesList;
     }
 
     public List<TextItem> getTextList() {
         return textList;
+    }
+
+    public List<Entity> getSkyboxList() {
+        return skyList;
     }
 
     public String getId() {

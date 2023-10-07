@@ -1,6 +1,9 @@
 package VanillaWaveEngine.Rendering;
 
 import VanillaWaveEngine.Entity;
+import VanillaWaveEngine.Rendering.AssetPool.FontCache;
+import VanillaWaveEngine.Rendering.AssetPool.SkyCache;
+import VanillaWaveEngine.Rendering.AssetPool.TextureCache;
 
 import java.util.*;
 
@@ -9,6 +12,7 @@ public class Scene {
     private Map<String, Model> modelMap;
     private TextureCache textureCache;
     private FontCache fontCache;
+    private SkyCache skyCache;
     private String DEFAULT_TEXTURE_PATH = "src/main/resources/textures/ERROR.png";
     private Texture DEFAULT_TEXTURE = new Texture(DEFAULT_TEXTURE_PATH);
 
@@ -19,6 +23,8 @@ public class Scene {
         textureCache = new TextureCache(DEFAULT_TEXTURE_PATH, DEFAULT_TEXTURE);
 
         fontCache = new FontCache(DEFAULT_TEXTURE_PATH, DEFAULT_TEXTURE);
+
+        skyCache = new SkyCache(DEFAULT_TEXTURE_PATH, DEFAULT_TEXTURE);
 
     }
 
@@ -44,6 +50,9 @@ public class Scene {
     }
     public FontCache getFontCache() {
         return fontCache;
+    }
+    public SkyCache getSkyCache() {
+        return skyCache;
     }
 
 }

@@ -4,12 +4,7 @@ import VanillaWaveEngine.Input.KeyboardListener;
 import VanillaWaveEngine.Input.MouseListener;
 import VanillaWaveEngine.Math.Vector3f;
 import VanillaWaveEngine.Math.Matrix4f;
-import VanillaWaveEngine.Rendering.Model;
-import VanillaWaveEngine.Rendering.TextureCache;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Camera {
 

@@ -17,8 +17,8 @@ public class Main implements Runnable {
 
     private Scene scene;
 
-    private Renderer objRenderer, txtRenderer;
-    private Shader objShader, txtShader;
+    private Renderer objRenderer, txtRenderer, skyRenderer;
+    private Shader objShader, txtShader, skyShader;
 
     public RenderHandler render;
 
@@ -53,21 +53,24 @@ public class Main implements Runnable {
         render.createMeshes();
         render.createMaterials();
         render.createFonts();
+        render.createSkybox();
 
         render.initializeEntities();
 
         // Creates the mesh before the program renders the mesh
         objShader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
         txtShader = new Shader("src/main/resources/shaders/textVertex.glsl", "src/main/resources/shaders/textFragment.glsl");
-        //skyShader = new Shader("src/main/resources/shaders/skyVertex.glsl", "src/main/resources/shaders/skyFragment.glsl");
+        skyShader = new Shader("src/main/resources/shaders/skyVertex.glsl", "src/main/resources/shaders/skyFragment.glsl");
 
         // Sets up the renderer to use the shader
         objRenderer = new Renderer(windowObject, objShader);
         txtRenderer = new Renderer(windowObject, txtShader);
+        skyRenderer = new Renderer(windowObject, skyShader);
 
         // Creates the shader before the program renders the shader
         objShader.create();
         txtShader.create();
+        skyShader.create();
 
     }
 
@@ -122,7 +125,7 @@ public class Main implements Runnable {
     public void render() {
 
         //render skybox, then objects, then GUI
-        //skyRenderer.renderMesh(scene, render.getSkyModel());
+        skyRenderer.renderSky(render.camera, scene, render.getSkyModel());
         objRenderer.renderMesh(render.camera, scene);
         txtRenderer.renderText(scene, render.getTextModel());
         Window.swapBuffer();

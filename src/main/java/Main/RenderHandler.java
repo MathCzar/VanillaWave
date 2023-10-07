@@ -14,11 +14,14 @@ public class RenderHandler {
 
     CubeMesh cube = new CubeMesh();
     FaceMesh face = new FaceMesh();
+    SkyMesh sky = new SkyMesh();
 
     TextItem FPSCounter;
 
     Texture woodTexture;
     Texture grassTexture;
+
+    Texture skyTexture;
 
     Texture font;
 
@@ -30,13 +33,18 @@ public class RenderHandler {
     public Entity orbit2 = new Entity(new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 2, "cube-model");
     public Entity orbit3 = new Entity(new Vector3f(0, 0, 10), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 3, "cube-model");
     public Entity orbit4 = new Entity(new Vector3f(0, 5, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 3, "cube-model");
-    public Entity faceEntity = new Entity(new Vector3f(5, 5, 5), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), face.faceMesh, 3, "face-model");
+    public Entity faceEntity = new Entity(new Vector3f(5, 5, 5), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), face.faceMesh, 2, "face-model");
+
+
+    public Entity skybox = new Entity(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1000, 1000, 1000), sky.skyCube, 5, "sky-model");
 
     private float temp, temp2, tempOrbitAngle = 0, tempOrbitX, tempOrbitZ, tempOrbitY, gameCycle = 0, tempOrbitX2, tempOrbitZ2, tempOrbitY2, tempOrbitAngle2 = 0;
 
     private int sphereResolution = 2;
 
     private Model cubeModel, faceModel;
+
+    private Model skyModel;
 
     private Model fontModel;
 
@@ -52,6 +60,7 @@ public class RenderHandler {
 
         cube.create();
         face.create();
+        sky.create();
 
     }
 
@@ -65,6 +74,12 @@ public class RenderHandler {
     private void createFontTextures() {
 
         font = scene.getFontCache().createFont("src/main/resources/textures/fonts/ExportedFont.png");
+
+    }
+
+    private void createSkyboxTextures() {
+
+        skyTexture = scene.getSkyCache().createSkybox("src/main/resources/textures/skyboxes/skybox.png");
 
     }
 
@@ -84,6 +99,24 @@ public class RenderHandler {
         faceModel = new Model("face-model", materialList, face.faceMesh);
         scene.addModel(cubeModel);
         scene.addModel(faceModel);
+
+    }
+
+    public void createSkybox() {
+
+        createSkyboxTextures();
+
+        Material skyMaterial = new Material();
+
+        skyMaterial.setTexturePath(skyTexture.getTexturePath());
+        List<Material> skyMaterialList = new ArrayList<>();
+        skyMaterialList.add(skyMaterial);
+
+        List<Entity> skyboxList = new ArrayList<>();
+
+        skyboxList.add(skybox);
+
+        skyModel = new Model("sky-model", skyMaterialList, skyboxList, sky.skyCube);
 
     }
 
@@ -228,6 +261,12 @@ public class RenderHandler {
     public Model getTextModel() {
 
         return fontModel;
+
+    }
+
+    public Model getSkyModel() {
+
+        return skyModel;
 
     }
 

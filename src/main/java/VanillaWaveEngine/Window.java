@@ -10,11 +10,16 @@ import VanillaWaveEngine.Rendering.Shader;
 
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -31,6 +36,8 @@ public class Window {
     private float red, green, blue, alpha;
 
     private Matrix4f projection;
+
+    private long audioDevice, audioContext;
 
     Shader shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
 
@@ -72,6 +79,10 @@ public class Window {
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
+
+        // Destroy audio context
+        alcDestroyContext(audioContext);
+        alcCloseDevice(audioDevice);
 
         // Terminate GLFW and free the error callback
         glfwTerminate();
@@ -135,6 +146,26 @@ public class Window {
 
         // Make the window visible
         glfwShowWindow(window);
+
+        // Initialize OpenAL
+        String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+        audioDevice = alcOpenDevice(defaultDeviceName);
+
+        int attributes[] = {0};
+
+        audioContext = alcCreateContext(audioDevice, attributes);
+
+        alcMakeContextCurrent(audioContext);
+
+        ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
+
+        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+
+        if (!alCapabilities.OpenAL10) {
+
+            assert false : "Audio Library not supported";
+
+        }
 
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
@@ -272,6 +303,10 @@ public class Window {
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(main.windowObject.window);
         glfwDestroyWindow(main.windowObject.window);
+
+        // Destroy audio context
+        alcDestroyContext(audioContext);
+        alcCloseDevice(audioDevice);
 
         // Terminate GLFW and free the error callback
         glfwTerminate();
