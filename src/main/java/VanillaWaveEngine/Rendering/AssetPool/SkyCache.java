@@ -7,13 +7,13 @@ import java.util.Map;
 
 public class SkyCache {
 
-    public String DEFAULT_FONT_PATH;
+    public String DEFAULT_SKY_PATH;
 
     private Map<String, Texture> skyMap;
 
-    public SkyCache(String DEFAULT_SKY_PATH, Texture DEFAULT_FONT) {
+    public SkyCache(String DEFAULT_SKY_PATH, Texture DEFAULT_TEXTURE) {
         skyMap = new HashMap<>();
-        skyMap.put(DEFAULT_SKY_PATH, DEFAULT_FONT);
+        skyMap.put(DEFAULT_SKY_PATH, DEFAULT_TEXTURE);
     }
 
     public Texture createSkybox(String skyPath) {
@@ -26,7 +26,7 @@ public class SkyCache {
             sky = skyMap.get(skyPath);
         }
         if (sky == null) {
-            sky = skyMap.get(DEFAULT_FONT_PATH);
+            sky = skyMap.get(DEFAULT_SKY_PATH);
         }
         return sky;
     }

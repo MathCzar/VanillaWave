@@ -1,7 +1,10 @@
 package Main;
 
 import VanillaWaveEngine.*;
+import VanillaWaveEngine.Math.Vector3f;
 import VanillaWaveEngine.Rendering.*;
+import VanillaWaveEngine.Sound.*;
+import org.lwjgl.openal.AL11;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -21,6 +24,9 @@ public class Main implements Runnable {
     private Shader objShader, txtShader, skyShader;
 
     public RenderHandler render;
+
+    private SoundSource playerSoundSource;
+    private SoundManager soundMgr;
 
     public static void main(String[] args) {
 
@@ -71,6 +77,8 @@ public class Main implements Runnable {
         objShader.create();
         txtShader.create();
         skyShader.create();
+
+        initSounds(render.camera.getPosition(), render.camera);
 
     }
 
@@ -131,5 +139,19 @@ public class Main implements Runnable {
         Window.swapBuffer();
 
     }
+
+    private void initSounds(Vector3f position, Camera camera) {
+        soundMgr = new SoundManager();
+        soundMgr.setAttenuationModel(AL11.AL_EXPONENT_DISTANCE);
+        soundMgr.setListener(new SoundListener(camera.getPosition()));
+
+        SoundBuffer buffer = new SoundBuffer("src/main/resources/sounds/backgroundmusic/reflected-light.ogg");
+        soundMgr.addSoundBuffer(buffer);
+        SoundSource source = new SoundSource(true, true);
+        source.setBuffer(buffer.getBufferId());
+        soundMgr.addSoundSource("MUSIC", source);
+        source.play();
+    }
+
 
 }
