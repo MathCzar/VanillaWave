@@ -7,7 +7,6 @@ import VanillaWaveEngine.Sound.*;
 import org.lwjgl.openal.AL11;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
 
 public class Main implements Runnable {
 
@@ -25,8 +24,8 @@ public class Main implements Runnable {
 
     public RenderHandler render;
 
-    private SoundSource playerSoundSource;
-    private SoundManager soundMgr;
+    public SoundSource playerSoundSource;
+    public SoundManager soundMgr;
 
     public static void main(String[] args) {
 
@@ -44,6 +43,8 @@ public class Main implements Runnable {
         // Cycle through the game
         loop();
 
+        soundMgr.cleanup();
+
         windowObject.terminate();
 
     }
@@ -53,20 +54,23 @@ public class Main implements Runnable {
         // Create the window
         windowObject = get();
 
+        // Initialize the scene
         scene = new Scene();
 
+        // Creates the mesh before the program renders the mesh
         render = new RenderHandler(scene);
         render.createMeshes();
         render.createMaterials();
         render.createFonts();
         render.createSkybox();
 
+        // Create entities before the shader starts to render the entity
         render.initializeEntities();
 
-        // Creates the mesh before the program renders the mesh
-        objShader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
-        txtShader = new Shader("src/main/resources/shaders/textVertex.glsl", "src/main/resources/shaders/textFragment.glsl");
-        skyShader = new Shader("src/main/resources/shaders/skyVertex.glsl", "src/main/resources/shaders/skyFragment.glsl");
+        // Initialize the shader
+        objShader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
+        txtShader = new Shader("/shaders/textVertex.glsl", "/shaders/textFragment.glsl");
+        skyShader = new Shader("/shaders/skyVertex.glsl", "/shaders/skyFragment.glsl");
 
         // Sets up the renderer to use the shader
         objRenderer = new Renderer(windowObject, objShader);
@@ -102,7 +106,6 @@ public class Main implements Runnable {
 
             // Renders the square created in the mesh
             render();
-            glViewport(0, 0, width, height);
 
         }
 
@@ -113,7 +116,7 @@ public class Main implements Runnable {
         // Makes sure there is only one window created
         if(windowObject == null) {
 
-            windowObject = new Window(width, height, title, this);
+            windowObject = new Window(width, height, title, "src/main/resources/textures/ERROR.png", this);
             windowObject.init();
 
         }
@@ -145,7 +148,14 @@ public class Main implements Runnable {
         soundMgr.setAttenuationModel(AL11.AL_EXPONENT_DISTANCE);
         soundMgr.setListener(new SoundListener(camera.getPosition()));
 
-        SoundBuffer buffer = new SoundBuffer("src/main/resources/sounds/backgroundmusic/reflected-light.ogg");
+        SoundBuffer buffer = new SoundBuffer("src/main/resources/sounds/ambient/creak1.ogg");
+        soundMgr.addSoundBuffer(buffer);
+        playerSoundSource = new SoundSource(false, false);
+        playerSoundSource.setPosition(position);
+        playerSoundSource.setBuffer(buffer.getBufferId());
+        soundMgr.addSoundSource("CREAK", playerSoundSource);
+
+        buffer = new SoundBuffer("src/main/resources/sounds/background/reflected-light.ogg");
         soundMgr.addSoundBuffer(buffer);
         SoundSource source = new SoundSource(true, true);
         source.setBuffer(buffer.getBufferId());

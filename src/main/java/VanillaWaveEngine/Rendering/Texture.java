@@ -1,9 +1,14 @@
 package VanillaWaveEngine.Rendering;
 
 import VanillaWaveEngine.Entity;
+import VanillaWaveEngine.Window;
 import org.lwjgl.system.MemoryStack;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.*;
+import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL30.*;
@@ -28,9 +33,16 @@ public class Texture {
             IntBuffer h = stack.mallocInt(1);
             IntBuffer channels = stack.mallocInt(1);
 
-            ByteBuffer buf = stbi_load(texturePath, w, h, channels, 4);
+            // Get the absolute path to find the resource file
+            File file = new File(texturePath);
+            String absolutePath = file.getAbsolutePath();
+            //URL res = Texture.class.getResource(texturePath);
+            //File file = Paths.get(res.toURI()).toFile();
+            //String absolutePath = file.getAbsolutePath();
+
+            ByteBuffer buf = stbi_load(absolutePath, w, h, channels, 4);
             if (buf == null) {
-                throw new RuntimeException("Image file [" + texturePath + "] not loaded: " + stbi_failure_reason());
+                throw new RuntimeException("Image file [" + texturePath + "] couldn't loaded: " + stbi_failure_reason());
             }
 
             this.width = w.get();
@@ -39,6 +51,8 @@ public class Texture {
             generateTexture(width, height, buf);
 
             stbi_image_free(buf);
+        //} catch (URISyntaxException e) {
+        //    e.printStackTrace();
         }
     }
 

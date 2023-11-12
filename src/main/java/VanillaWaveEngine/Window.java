@@ -1,6 +1,8 @@
 package VanillaWaveEngine;
 
+import java.io.File;
 import java.lang.Thread;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import VanillaWaveEngine.Input.KeyboardListener;
@@ -10,53 +12,56 @@ import VanillaWaveEngine.Rendering.Shader;
 
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.ALC;
-import org.lwjgl.openal.ALCCapabilities;
-import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
 
-    private final int width, height;
-    private final String title;
-    private boolean isFullscreen;
+    private final int windowWidth, windowHeight;
+    private int width, height;
+    private final String title, windowIcon;
+    private boolean isFullscreen, playing, hasResized;
     public static long window;
 
-    private Main.Main main;
+    private final Main.Main main;
 
-    private float red, green, blue, alpha;
+    private final float red, green, blue, alpha;
 
-    private Matrix4f projection;
+    private final Matrix4f projection;
 
-    private long audioDevice, audioContext;
+    //private long audioDevice, audioContext;
 
-    Shader shader = new Shader("src/main/resources/shaders/mainVertex.glsl", "src/main/resources/shaders/mainFragment.glsl");
+    Shader shader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
 
     public int frames, finalFrames;
     public double frameLimit = 144.0;
     public long time;
 
-    public Window(int width, int height, String title, Main.Main main) {
+    public Window(int width, int height, String title, String windowIcon, Main.Main main) {
 
         // Get LWJGL 3 Version
         System.out.println("The current version of LWJGL is " + Version.getVersion());
 
         // Sets the size of the start-up window
+        this.windowWidth = width;
+        this.windowHeight = height;
         this.width = width;
         this.height = height;
 
         // Sets the title of the window
         this.title = title;
 
+        // Set the icon's image path
+        this.windowIcon = windowIcon;
+
+        // Sets the final class
         this.main = main;
 
         // Sets the rgba of the screen background
@@ -65,10 +70,11 @@ public class Window {
         blue = 0f;
         alpha = 1f;
 
-        this.isFullscreen = false;
+        this.isFullscreen = true;
+        this.playing = false;
 
         // Set up projection matrix
-        projection = Matrix4f.projection(90.0f, (float) 1920 / (float) 1080, 0.1f, 1000.0f);
+        projection = Matrix4f.projection(90.0f, (float) 1920 / (float) 1080, 0.01f, 1000.0f);
 
     }
 
@@ -81,8 +87,8 @@ public class Window {
         glfwDestroyWindow(window);
 
         // Destroy audio context
-        alcDestroyContext(audioContext);
-        alcCloseDevice(audioDevice);
+        //alcDestroyContext(audioContext);
+        //alcCloseDevice(audioDevice);
 
         // Terminate GLFW and free the error callback
         glfwTerminate();
@@ -106,7 +112,7 @@ public class Window {
         VanillaWaveDefaultConfig();
 
         // Create the window
-        window = glfwCreateWindow(this.width, this.height, this.title, glfwGetPrimaryMonitor(), NULL);
+        window = glfwCreateWindow(this.windowWidth, this.windowHeight, this.title, glfwGetPrimaryMonitor(), NULL);
 
         try (MemoryStack stack = stackPush()) {
 
@@ -147,25 +153,66 @@ public class Window {
         // Make the window visible
         glfwShowWindow(window);
 
-        // Initialize OpenAL
-        String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
-        audioDevice = alcOpenDevice(defaultDeviceName);
+        try (MemoryStack stack = MemoryStack.stackPush()) {
 
-        int attributes[] = {0};
+            // Check to see if the file exists
+            //FileUtilities.loadAsString(windowIcon);
 
-        audioContext = alcCreateContext(audioDevice, attributes);
+            // Get the absolute path to find the resource file
+            File file = new File(windowIcon);
+            String absolutePath = file.getAbsolutePath();
+            //System.out.println(absolutePath);
 
-        alcMakeContextCurrent(audioContext);
+            // Allocate memory to image
+            IntBuffer w = stack.mallocInt(1);
+            IntBuffer h = stack.mallocInt(1);
+            IntBuffer channels = stack.mallocInt(1);
 
-        ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
+            // Create a byte buffer and check to see if it could
+            ByteBuffer image = stbi_load(absolutePath, w, h, channels, 4);
+            if (image == null) {
+                throw new RuntimeException("Image file [" + windowIcon + "] not loaded: " + stbi_failure_reason());
+            }
 
-        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+            // Create the image and the buffer
+            GLFWImage iconImage = GLFWImage.malloc();
+            GLFWImage.Buffer iconBuffer = GLFWImage.malloc(1);
 
-        if (!alCapabilities.OpenAL10) {
+            // Set the image
+            iconImage.set(w.get(), h.get(), image);
 
-            assert false : "Audio Library not supported";
+            // Set the buffer
+            iconBuffer.put(0, iconImage);
+
+            // Set the icon
+            glfwSetWindowIcon(window, iconBuffer);
+
+            // Free up the image
+            stbi_image_free(image);
 
         }
+
+        setLocalCallbacks();
+
+        // Initialize OpenAL
+        //String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+        //audioDevice = alcOpenDevice(defaultDeviceName);
+
+        //int attributes[] = {0};
+
+        //audioContext = alcCreateContext(audioDevice, attributes);
+
+        //alcMakeContextCurrent(audioContext);
+
+        //ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
+
+        //ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+
+        //if (!alCapabilities.OpenAL10) {
+
+            //assert false : "Audio Library not supported";
+
+        //}
 
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
@@ -178,92 +225,130 @@ public class Window {
 
     public void loop() {
 
-            // Measure speed
-            frames++;
-            if (System.currentTimeMillis() > time + 1000) {
+        // Measure speed
+        frames++;
+        if (System.currentTimeMillis() > time + 1000) {
 
-                finalFrames = frames;
-                time = System.currentTimeMillis();
-                frames = 0;
+            finalFrames = frames;
+            time = System.currentTimeMillis();
+            frames = 0;
+
+        }
+
+        // Set the clear color
+        glClearColor(red, green, blue, alpha);
+
+        // clear the framebuffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Destroys the window and terminates the program without an error
+        if (KeyboardListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
+
+            shader.destroy();
+
+            glfwDestroyWindow(window);
+
+            glfwTerminate();
+
+            main.soundMgr.cleanup();
+
+            System.exit(0);
+
+        }
+
+        if (KeyboardListener.isKeyPressed(GLFW_KEY_P)) {
+
+            main.playerSoundSource.play();
+
+        }
+
+        // If it is not fullscreen and has resized, change the viewport so the player can see the screen they resized to
+        if (hasResized && !isFullscreen) {
+
+            glViewport(0, 0, this.width, this.height);
+
+            hasResized = false;
+
+        }
+
+        // Makes the window toggleable to be fullscreen or not
+        if (KeyboardListener.isKeyPressed(GLFW_KEY_F11)) {
+
+            // Set the window's position, scale, and refresh rate
+            glfwSetWindowMonitor(
+                    (window),
+                    (isFullscreen ? NULL : glfwGetPrimaryMonitor()),
+                    (isFullscreen ? this.windowWidth /4 : 0),
+                    (isFullscreen ? this.windowHeight/4 : 0),
+                    (isFullscreen ? this.windowWidth /2 : this.windowWidth),
+                    (isFullscreen ? this.windowHeight/2 : this.windowHeight),
+                    (GLFW_DONT_CARE));
+
+            //glfwSetWindowSize(window, (isFullscreen ? this.windowWidth /2 : this.windowWidth), (isFullscreen ? this.windowHeight/2 : this.windowHeight));
+
+            // Sets the view of the window
+            glViewport((isFullscreen ? this.windowWidth/4 : 0),
+                    (isFullscreen ? this.windowHeight/4 : 0),
+                    (isFullscreen ? this.windowWidth/2 : this.windowWidth),
+                    (isFullscreen ? this.windowHeight/2 : this.windowHeight));
+
+            isFullscreen = isFullscreen ? false : true;
+
+            //if (isFullscreen) {
+
+                //isFullscreen = false;
+
+            //}
+            //else if (!isFullscreen) {
+
+                //isFullscreen = true;
+
+            //}
+            //else {
+
+                //throw new RuntimeException("The window variable is neither true nor false");
+
+            //}
+
+            // Makes the thread sleep to prevent the fullscreen bugging out
+            try {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException ex){
+
+                throw new RuntimeException("The thread could not sleep");
 
             }
 
-            // Set the clear color
-            glClearColor(red, green, blue, alpha);
+        }
 
-            // clear the framebuffer
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glfwSetWindowSizeCallback(window, GLFW);
 
-            // Destroys the window and terminates the program without an error
-            if (KeyboardListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
+        //if (isFullscreen) {
 
-                shader.destroy();
+            //double lastTime = glfwGetTime();
+            //while (glfwGetTime() < lastTime + 1.0/frameLimit) {
 
-                glfwDestroyWindow(window);
+            //}
+        //}
 
-                glfwTerminate();
 
-                System.exit(0);
 
-            }
+        // Toggleable mouse lock
+        if (playing) {
 
-            // Makes the window toggleable to be fullscreen or not
-            if (KeyboardListener.isKeyPressed(GLFW_KEY_F11)) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-                glfwSetWindowMonitor(
-                        (window),
-                        (isFullscreen ? NULL : glfwGetPrimaryMonitor()),
-                        (isFullscreen ? this.width/4 : 0),
-                        (isFullscreen ? this.height/4 : 0),
-                        (isFullscreen ? this.width/2 : this.width),
-                        (isFullscreen ? this.height/2 : this.height),
-                        (GLFW_DONT_CARE));
+        }
+        else {
 
-                // Enable v-sync
-                glfwSwapInterval(1);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-                if (isFullscreen) {
+        }
 
-                    isFullscreen = false;
-
-                }
-                else if (!isFullscreen) {
-
-                    isFullscreen = true;
-
-                }
-                else {
-
-                    throw new RuntimeException("The window variable is neither true nor false");
-
-                }
-
-                // Makes the thread sleep to prevent the fullscreen bugging out
-                try {
-                    Thread.sleep(500);
-                }
-                catch (InterruptedException ex){
-
-                    throw new RuntimeException("The thread could not sleep");
-
-                }
-
-            }
-            if (isFullscreen) {
-
-                double lastTime = glfwGetTime();
-                while (glfwGetTime() < lastTime + 1.0/frameLimit) {
-
-                }
-
-            }
-
-            // Toggleable mouse lock
-            glfwSetInputMode(window, GLFW_CURSOR, (MouseListener.buttonPressedDown(GLFW_MOUSE_BUTTON_LEFT) ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL));
-
-            // Poll for window events. The key callback above will only be
-            // invoked during this call.
-            glfwPollEvents();
+        // Poll for window events. The key callback above will only be
+        // invoked during this call.
+        glfwPollEvents();
 
     }
 
@@ -305,8 +390,8 @@ public class Window {
         glfwDestroyWindow(main.windowObject.window);
 
         // Destroy audio context
-        alcDestroyContext(audioContext);
-        alcCloseDevice(audioDevice);
+        //alcDestroyContext(audioContext);
+        //alcCloseDevice(audioDevice);
 
         // Terminate GLFW and free the error callback
         glfwTerminate();
@@ -317,6 +402,24 @@ public class Window {
     public int getFrames() {
 
         return finalFrames;
+
+    }
+
+    private void setLocalCallbacks() {
+
+        //Checks to see if the window was resized
+        GLFWWindowSizeCallback windowSizeCallback = new GLFWWindowSizeCallback() {
+            @Override
+            public void invoke(long window, int callWidth, int callHeight) {
+
+                width = callWidth;
+                height = callHeight;
+                hasResized = true;
+
+            }
+        };
+
+        glfwSetWindowSizeCallback(window, windowSizeCallback);
 
     }
 

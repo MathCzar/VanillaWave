@@ -11,7 +11,7 @@ public class FileUtilities {
 
         StringBuilder result = new StringBuilder();
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)))) {
+        try (InputStream inputStream = FileUtilities.class.getResourceAsStream(path); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
             String line;
 

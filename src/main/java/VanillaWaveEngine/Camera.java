@@ -70,6 +70,17 @@ public class Camera {
 
         rotation = Vector3f.add(rotation, new Vector3f(-dy * mouseSensitivity, -dx * mouseSensitivity, 0));
 
+        if (rotation.getX() > 90.0f) {
+
+            rotation.setX(90.0f);
+
+        }
+        else if (rotation.getX() < -90.0f) {
+
+            rotation.setX(-90.0f);
+
+        }
+
         oldMouseX = newMouseX;
         oldMouseY = newMouseY;
 

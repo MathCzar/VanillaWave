@@ -1,25 +1,18 @@
-
-apply plugin: 'java'
-apply plugin: 'application'
+plugins {
+    id 'java'
+    id 'application'
+}
 
 application {
     mainClassName = 'Main.Main'
 }
 
 jar {
-    from {
-        configurations.runtime.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-        configurations.compile.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
     manifest {
-        attributes 'Main-Class': 'src.main.java.Main.Main'
+        attributes (
+                'Main-Class': 'Main.Main'
+        )
     }
-
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
 
 version '1.0-SNAPSHOT'
@@ -30,7 +23,7 @@ repositories {
     mavenCentral()
 }
 
-project.ext.lwjglVersion = "3.2.3"
+project.ext.lwjglVersion = "3.3.3"
 project.ext.jomlVersion = "1.10.5"
 project.ext.lwjglNatives = "natives-windows"
 
