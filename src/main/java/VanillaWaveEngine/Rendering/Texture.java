@@ -1,14 +1,10 @@
 package VanillaWaveEngine.Rendering;
 
-import VanillaWaveEngine.Entity;
-import VanillaWaveEngine.Window;
+import VanillaWaveEngine.Object;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.*;
-import java.nio.file.Paths;
 
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL30.*;
@@ -56,8 +52,8 @@ public class Texture {
         }
     }
 
-    public void bind(Entity entity) {
-        glBindTexture(GL_TEXTURE_2D, entity.getTextureID());
+    public void bind(Object object) {
+        glBindTexture(GL_TEXTURE_2D, object.getMaterialID());
     }
 
     public void bindText(TextItem text) {
@@ -79,6 +75,8 @@ public class Texture {
                 GL_RGBA, GL_UNSIGNED_BYTE, buf);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
+
+    public int getTextureId() {return textureId;}
 
     public String getTexturePath() {
         return texturePath;

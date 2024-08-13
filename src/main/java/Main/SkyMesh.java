@@ -90,38 +90,36 @@ public class SkyMesh {
             new Vertex(new Vector2f(0.5f, 1.0f)),
             new Vertex(new Vector2f(0.5f, 0.66f))
 
-    },
-            new float[] {
+    }, new float[] {
 
-                    0
+            0
 
-            },
-            new int[] {
+    }, new int[] {
 
-                    //Back face
-                    0, 1, 3,
-                    3, 1, 2,
+            //Back face
+            0, 1, 3,
+            3, 1, 2,
 
-                    //Front face
-                    4, 5, 7,
-                    7, 5, 6,
+            //Front face
+            4, 5, 7,
+            7, 5, 6,
 
-                    //Right face
-                    8, 9, 11,
-                    11, 9, 10,
+            //Right face
+            8, 9, 11,
+            11, 9, 10,
 
-                    //Left face
-                    12, 13, 15,
-                    15, 13, 14,
+            //Left face
+            12, 13, 15,
+            15, 13, 14,
 
-                    //Top face
-                    16, 17, 19,
-                    19, 17, 18,
+            //Top face
+            16, 17, 19,
+            19, 17, 18,
 
-                    //Bottom face
-                    20, 21, 23,
-                    23, 21, 22
+            //Bottom face
+            20, 21, 23,
+            23, 21, 22
 
-            });
+    });
 
 }

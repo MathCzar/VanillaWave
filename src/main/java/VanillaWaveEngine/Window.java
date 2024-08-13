@@ -38,7 +38,7 @@ public class Window {
 
     //private long audioDevice, audioContext;
 
-    Shader shader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
+    //Shader shader = new Shader("/resources/shaders/mainVertex.glsl", "/resources/shaders/mainFragment.glsl");
 
     public int frames, finalFrames;
     public double frameLimit = 144.0;
@@ -74,7 +74,7 @@ public class Window {
         this.playing = false;
 
         // Set up projection matrix
-        projection = Matrix4f.projection(90.0f, (float) 1920 / (float) 1080, 0.01f, 1000.0f);
+        projection = Matrix4f.projection(90.0f, (float) 1920 / (float) 1080, 0.01f, 100000.0f);
 
     }
 
@@ -244,7 +244,9 @@ public class Window {
         // Destroys the window and terminates the program without an error
         if (KeyboardListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
 
-            shader.destroy();
+            main.skyShader.destroy();
+            main.txtShader.destroy();
+            main.objShader.destroy();
 
             glfwDestroyWindow(window);
 
@@ -332,7 +334,25 @@ public class Window {
             //}
         //}
 
+        if (KeyboardListener.isKeyPressed(GLFW_KEY_DELETE)) {
+            if (!playing) {
+                playing = true;
+            }
+            else {
+                playing = false;
+            }
+        }
 
+        if (KeyboardListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
+
+            main.render.camera.setMoveSpeed(1.0f);
+
+        }
+        else if (!KeyboardListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
+
+            main.render.camera.setMoveSpeed(0.05f);
+
+        }
 
         // Toggleable mouse lock
         if (playing) {
@@ -367,6 +387,13 @@ public class Window {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // The window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // The window will be resizable
         glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE); // The window will be maximized
+
+        //MacOS stuff
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
     }
 

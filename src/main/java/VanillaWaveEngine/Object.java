@@ -3,21 +3,17 @@ package VanillaWaveEngine;
 import VanillaWaveEngine.Math.Vector3f;
 import VanillaWaveEngine.Rendering.Mesh;
 
-public class Entity {
+public class Object {
 
     public Vector3f position, rotation, scale;
-    private final int textureID, materialID;
+    private final int materialID;
     private final String modelID;
-    private Mesh mesh;
 
-
-    public Entity(Vector3f position, Vector3f rotation, Vector3f scale, Mesh mesh, int materialID, String modelID) {
+    public Object(Vector3f position, Vector3f rotation, Vector3f scale, int materialID, String modelID) {
 
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
-        this.mesh = mesh;
-        this.textureID = materialID;
         this.materialID = materialID;
         this.modelID = modelID;
 
@@ -92,18 +88,6 @@ public class Entity {
     public Vector3f getScale() {
 
         return scale;
-
-    }
-
-    public Mesh getMesh() {
-
-        return mesh;
-
-    }
-
-    public int getTextureID() {
-
-        return textureID;
 
     }
 

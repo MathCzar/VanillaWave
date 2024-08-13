@@ -1,6 +1,6 @@
 package VanillaWaveEngine.Rendering;
 
-import VanillaWaveEngine.Entity;
+import VanillaWaveEngine.Object;
 import VanillaWaveEngine.Rendering.AssetPool.FontCache;
 import VanillaWaveEngine.Rendering.AssetPool.SkyCache;
 import VanillaWaveEngine.Rendering.AssetPool.TextureCache;
@@ -28,13 +28,13 @@ public class Scene {
 
     }
 
-    public void addEntity(Entity entity) {
-        String modelID = entity.getModelID();
+    public void addObject(Object object) {
+        String modelID = object.getModelID();
         Model model = modelMap.get(modelID);
         if (model == null) {
             throw new RuntimeException("Could not find model [" + modelID + "]");
         }
-        model.getEntitiesList().add(entity);
+        model.getObjectList().add(object);
     }
 
     public void addModel(Model model) {

@@ -9,11 +9,11 @@ public class FaceMesh {
 
     public void create() {
 
-        faceMesh.create();
+        mesh.create();
 
     }
 
-    public Mesh faceMesh = new Mesh(new Vertex[] {
+    public Mesh mesh = new Mesh(new Vertex[] {
 
             //Front face
             new Vertex(new Vector3f(-0.5f,  0.5f,  0.0f)),

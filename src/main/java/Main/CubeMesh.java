@@ -9,82 +9,48 @@ public class CubeMesh {
 
     public void create() {
 
-        meshCube.create();
+        mesh.create();
 
     }
 
-    public Mesh meshCube = new Mesh(new Vertex[] {
+    public Mesh mesh = new Mesh(new Vertex[] {
 
-            //Back face
-            new Vertex(new Vector3f(-0.5f,  0.5f, -0.5f)),
-            new Vertex(new Vector3f(-0.5f, -0.5f, -0.5f)),
-            new Vertex(new Vector3f( 0.5f, -0.5f, -0.5f)),
-            new Vertex(new Vector3f( 0.5f,  0.5f, -0.5f)),
+            new Vertex(new Vector3f(-0.57735026f ,-0.57735026f ,0.57735026f )),new Vertex(new Vector3f(-0.6770032f ,-0.28867513f ,0.6770032f )),
+            new Vertex(new Vector3f(-0.28867513f ,-0.6770032f ,0.6770032f )),new Vertex(new Vector3f(-0.3385016f ,-0.3385016f ,0.8779711f )),
+            new Vertex(new Vector3f(0.0f ,-0.70710677f ,0.70710677f )),new Vertex(new Vector3f(0.0f ,-0.35355338f ,0.9354144f )),
+            new Vertex(new Vector3f(0.28867513f ,-0.6770032f ,0.6770032f )),new Vertex(new Vector3f(0.3385016f ,-0.3385016f ,0.8779711f )),
+            new Vertex(new Vector3f(0.57735026f ,-0.57735026f ,0.57735026f )), new Vertex(new Vector3f(0.6770032f ,-0.28867513f ,0.6770032f )),
 
-            //Front face
-            new Vertex(new Vector3f(-0.5f,  0.5f,  0.5f)),
-            new Vertex(new Vector3f(-0.5f, -0.5f,  0.5f)),
-            new Vertex(new Vector3f( 0.5f, -0.5f,  0.5f)),
-            new Vertex(new Vector3f( 0.5f,  0.5f,  0.5f)),
 
-            //Right face
-            new Vertex(new Vector3f( 0.5f,  0.5f, -0.5f)),
-            new Vertex(new Vector3f( 0.5f, -0.5f, -0.5f)),
-            new Vertex(new Vector3f( 0.5f, -0.5f,  0.5f)),
-            new Vertex(new Vector3f( 0.5f,  0.5f,  0.5f)),
 
-            //Left face
-            new Vertex(new Vector3f(-0.5f,  0.5f, -0.5f)),
-            new Vertex(new Vector3f(-0.5f, -0.5f, -0.5f)),
-            new Vertex(new Vector3f(-0.5f, -0.5f,  0.5f)),
-            new Vertex(new Vector3f(-0.5f,  0.5f,  0.5f)),
 
-            //Top face
-            new Vertex(new Vector3f(-0.5f,  0.5f,  0.5f)),
-            new Vertex(new Vector3f(-0.5f,  0.5f, -0.5f)),
-            new Vertex(new Vector3f( 0.5f,  0.5f, -0.5f)),
-            new Vertex(new Vector3f( 0.5f,  0.5f,  0.5f)),
 
-            //Bottom face
-            new Vertex(new Vector3f(-0.5f, -0.5f,  0.5f)),
-            new Vertex(new Vector3f(-0.5f, -0.5f, -0.5f)),
-            new Vertex(new Vector3f( 0.5f, -0.5f, -0.5f)),
-            new Vertex(new Vector3f( 0.5f, -0.5f,  0.5f)),
+
+
+            new Vertex(new Vector3f(-0.70710677f ,0.0f ,0.70710677f )),new Vertex(new Vector3f(-0.6770032f ,0.28867513f ,0.6770032f )),
+            new Vertex(new Vector3f(-0.35355338f ,0.0f ,0.9354144f )),new Vertex(new Vector3f(-0.3385016f ,0.3385016f ,0.8779711f )),
+            new Vertex(new Vector3f(0.0f ,0.0f ,1.0f )),new Vertex(new Vector3f(0.0f ,0.35355338f ,0.9354144f )),
+            new Vertex(new Vector3f(0.35355338f ,0.0f ,0.9354144f )),new Vertex(new Vector3f(0.3385016f ,0.3385016f ,0.8779711f )),
+            new Vertex(new Vector3f(0.70710677f ,0.0f ,0.70710677f )),new Vertex(new Vector3f(0.6770032f ,0.28867513f ,0.6770032f )),
+
+
+
+
+
+
+
+            new Vertex(new Vector3f(-0.57735026f ,0.57735026f ,0.57735026f )),
+            new Vertex(new Vector3f(-0.28867513f ,0.6770032f ,0.6770032f )),
+            new Vertex(new Vector3f(0.0f ,0.70710677f ,0.70710677f )),
+            new Vertex(new Vector3f(0.28867513f ,0.6770032f ,0.6770032f )),
+            new Vertex(new Vector3f(0.57735026f ,0.57735026f ,0.57735026f )),
+
+
 
 
     }, new Vertex[] {
 
             //Back face
-            new Vertex(new Vector2f(0.0f, 0.0f)),
-            new Vertex(new Vector2f(0.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 0.0f)),
-
-            //Front face
-            new Vertex(new Vector2f(0.0f, 0.0f)),
-            new Vertex(new Vector2f(0.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 0.0f)),
-
-            //Right face
-            new Vertex(new Vector2f(0.0f, 0.0f)),
-            new Vertex(new Vector2f(0.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 0.0f)),
-
-            //Left face
-            new Vertex(new Vector2f(0.0f, 0.0f)),
-            new Vertex(new Vector2f(0.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 0.0f)),
-
-            //Top face
-            new Vertex(new Vector2f(0.0f, 0.0f)),
-            new Vertex(new Vector2f(0.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 0.0f)),
-
-            //Bottom face
             new Vertex(new Vector2f(0.0f, 0.0f)),
             new Vertex(new Vector2f(0.0f, 1.0f)),
             new Vertex(new Vector2f(1.0f, 1.0f)),
@@ -98,29 +64,46 @@ public class CubeMesh {
     },
     new int[] {
 
-            //Back face
-            0, 1, 3,
-            3, 1, 2,
+            0,
+            1,
+            2,
+            1,
+            2,
+            3,
+            2,
+            3,
+            4,
 
-            //Front face
-            4, 5, 7,
-            7, 5, 6,
+            3,
+            4,
+            5,
+            4,
+            5,
+            6,
 
-            //Right face
-            8, 9, 11,
-            11, 9, 10,
+            5,
+            6,
+            7,
+            6,
+            7,
+            8,
+            7,
+            8,
+            9,
 
-            //Left face
-            12, 13, 15,
-            15, 13, 14,
+            10,
+            11,
+            12,
+            11,
+            12,
+            13,
+            12,
+            13,
+            14,
+            13,
+            14,
+            15,
 
-            //Top face
-            16, 17, 19,
-            19, 17, 18,
-
-            //Bottom face
-            20, 21, 23,
-            23, 21, 22
 
     });
 

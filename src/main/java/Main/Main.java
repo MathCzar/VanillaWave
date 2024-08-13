@@ -6,6 +6,9 @@ import VanillaWaveEngine.Rendering.*;
 import VanillaWaveEngine.Sound.*;
 import org.lwjgl.openal.AL11;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Main implements Runnable {
@@ -20,7 +23,7 @@ public class Main implements Runnable {
     private Scene scene;
 
     private Renderer objRenderer, txtRenderer, skyRenderer;
-    private Shader objShader, txtShader, skyShader;
+    public Shader objShader, txtShader, skyShader;
 
     public RenderHandler render;
 
@@ -59,6 +62,7 @@ public class Main implements Runnable {
 
         // Creates the mesh before the program renders the mesh
         render = new RenderHandler(scene);
+        render.createLoading();
         render.createMeshes();
         render.createMaterials();
         render.createFonts();
@@ -68,13 +72,13 @@ public class Main implements Runnable {
         render.initializeEntities();
 
         // Initialize the shader
-        objShader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
         txtShader = new Shader("/shaders/textVertex.glsl", "/shaders/textFragment.glsl");
+        objShader = new Shader("/shaders/mainVertex.glsl", "/shaders/mainFragment.glsl");
         skyShader = new Shader("/shaders/skyVertex.glsl", "/shaders/skyFragment.glsl");
 
         // Sets up the renderer to use the shader
-        objRenderer = new Renderer(windowObject, objShader);
         txtRenderer = new Renderer(windowObject, txtShader);
+        objRenderer = new Renderer(windowObject, objShader);
         skyRenderer = new Renderer(windowObject, skyShader);
 
         // Creates the shader before the program renders the shader
@@ -97,6 +101,13 @@ public class Main implements Runnable {
 
             // Updates FPS text
             render.FPSCounter.setText(String.valueOf(windowObject.getFrames()));
+
+            // Update player coordinates
+            DecimalFormat playerDecimalFormat = new DecimalFormat("#.###");
+            playerDecimalFormat.setRoundingMode(RoundingMode.CEILING);
+            render.Xcoordinate.setText("X:" + playerDecimalFormat.format(render.camera.getPosition().getX()));
+            render.Ycoordinate.setText("Y:" + playerDecimalFormat.format(render.camera.getPosition().getY()));
+            render.Zcoordinate.setText("Z:" + playerDecimalFormat.format(render.camera.getPosition().getZ()));
 
             // Updates the object position and rotation
             render.updateMatrix();
@@ -160,7 +171,7 @@ public class Main implements Runnable {
         SoundSource source = new SoundSource(true, true);
         source.setBuffer(buffer.getBufferId());
         soundMgr.addSoundSource("MUSIC", source);
-        source.play();
+        //source.play();
     }
 
 

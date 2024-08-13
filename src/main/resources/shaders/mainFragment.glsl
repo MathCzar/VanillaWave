@@ -1,4 +1,4 @@
-#version 460 core
+#version 330 core
 //varying out vec4 outColor;
 
 in vec2 outTextCoord;
@@ -9,5 +9,5 @@ uniform sampler2D txtSampler;
 
 void main()
 {
-    outColor = texture(txtSampler, outTextCoord);
+    outColor = texture(txtSampler, outTextCoord) * vec4(0.75f, 0.75f, 0.75f, 1.0f);
 }

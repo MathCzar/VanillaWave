@@ -1,15 +1,15 @@
 package VanillaWaveEngine.Rendering;
 
-import VanillaWaveEngine.Entity;
+import VanillaWaveEngine.Object;
 
 import java.util.*;
 
 public class Model {
 
     private final String id;
-    private List<Entity> entitiesList;
+    private List<Object> entitiesList;
     private List<TextItem> textList;
-    private List<Entity> skyList;
+    private List<Object> skyList;
     private List<Material> materialList;
     private final Mesh mesh;
 
@@ -20,21 +20,21 @@ public class Model {
         this.mesh = mesh;
     }
 
-    public Model(String id, List<Material> materialList, Mesh mesh, List<TextItem> textList) {
+    public Model(String id, List<Material> materialList, List<TextItem> textList) {
         this.id = id;
         this.textList = textList;
         this.materialList = materialList;
-        this.mesh = mesh;
+        this.mesh = null;
     }
 
-    public Model(String id, List<Material> materialList, List<Entity> skyList, Mesh mesh) {
+    public Model(String id, List<Material> materialList, List<Object> skyList, Mesh mesh) {
         this.id = id;
         this.skyList = skyList;
         this.materialList = materialList;
         this.mesh = mesh;
     }
 
-    public List<Entity> getEntitiesList() {
+    public List<Object> getObjectList() {
         return entitiesList;
     }
 
@@ -42,7 +42,7 @@ public class Model {
         return textList;
     }
 
-    public List<Entity> getSkyboxList() {
+    public List<Object> getSkyboxList() {
         return skyList;
     }
 

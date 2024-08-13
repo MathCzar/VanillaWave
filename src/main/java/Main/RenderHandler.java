@@ -1,22 +1,27 @@
 package Main;
 
+import GameTest.SolarSystem;
 import VanillaWaveEngine.Camera;
-import VanillaWaveEngine.Entity;
+import VanillaWaveEngine.Object;
 import VanillaWaveEngine.Math.Vector3f;
 import VanillaWaveEngine.Rendering.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class RenderHandler {
 
-    public Camera camera = new Camera(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
+    public Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 0.0f, 0.0f));
 
     CubeMesh cube = new CubeMesh();
     FaceMesh face = new FaceMesh();
     SkyMesh sky = new SkyMesh();
-
+    SphereMesh sphere = new SphereMesh();
+    SolarSystem system = new SolarSystem();
     TextItem FPSCounter;
+    TextItem Xcoordinate, Ycoordinate, Zcoordinate;
+    TextItem loadingScreen;
 
     Texture woodTexture;
     Texture grassTexture;
@@ -28,27 +33,30 @@ public class RenderHandler {
     //public Entity cube_render = new Entity(new Vector3f(2.5f, 2.5f, 2.5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
     //public Entity cube_render2 = new Entity(new Vector3f(5f, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
     //public Entity cube_render3 = new Entity(new Vector3f(0, 0, 5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube);
-    public Entity center = new Entity(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 2, "cube-model");
-    public Entity orbit = new Entity(new Vector3f(10, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 2, "cube-model");
-    public Entity orbit2 = new Entity(new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 2, "cube-model");
-    public Entity orbit3 = new Entity(new Vector3f(0, 0, 10), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 3, "cube-model");
-    public Entity orbit4 = new Entity(new Vector3f(0, 5, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), cube.meshCube, 3, "cube-model");
-    public Entity faceEntity = new Entity(new Vector3f(5, 5, 5), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), face.faceMesh, 2, "face-model");
+    public Object center = new Object(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), 10, "cube");
+    //public Object orbit = new Object(new Vector3f(10, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), 2, "cube");
+    //public Object orbit2 = new Object(new Vector3f(0, 10, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), 2, "cube");
+    //public Object orbit3 = new Object(new Vector3f(0, 0, 10), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), 3, "cube");
+    //public Object orbit4 = new Object(new Vector3f(0, 5, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), 3, "cube");
+    //public Object faceEntity = new Object(new Vector3f(5, 5, 5), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), 2, "face");
+    //public Object cube_render = new Object(new Vector3f(-2, -2, -2), new Vector3f(0, 0, 0),new Vector3f(1, 1, 1) , 3, "cube");
+    //public Object cube_render2 = new Object(new Vector3f(5f, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), 2, "cube");
+    //public Object cube_render3 = new Object(new Vector3f(0, 0, 5f), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1), 2, "cube");
+    //public Object circle = new Object(new Vector3f(0, 2, 0), new Vector3f(0, 0, 0), new Vector3f(10, 10, 10), 2, "sphere");
 
+    public Object skybox = new Object(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(2000, 2000, 2000), 5, "sky");
 
-    public Entity skybox = new Entity(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1000, 1000, 1000), sky.skyCube, 5, "sky-model");
-
-    private float temp, temp2, tempOrbitAngle = 0, tempOrbitX, tempOrbitZ, tempOrbitY, gameCycle = 0, tempOrbitX2, tempOrbitZ2, tempOrbitY2, tempOrbitAngle2 = 0;
+    private float temp, temp2, tempOrbitAngle = 0, tempOrbitX, tempOrbitZ, tempOrbitY, gameCycle = 0, tempOrbitX2, tempOrbitZ2, tempOrbitY2, tempOrbitAngle2 = 0, tempCubeAngle = 0;
 
     private int sphereResolution = 2;
 
-    private Model cubeModel, faceModel;
+    private Model cubeModel, faceModel, sphereModel;
 
     private Model skyModel;
 
     private Model fontModel;
 
-    private final Scene scene;
+    public final Scene scene;
 
     public RenderHandler(Scene scene) {
 
@@ -61,6 +69,7 @@ public class RenderHandler {
         cube.create();
         face.create();
         sky.create();
+        sphere.constructMesh(2);
 
     }
 
@@ -95,10 +104,12 @@ public class RenderHandler {
         materialList.add(wood);
         materialList.add(grass);
 
-        cubeModel = new Model("cube-model", materialList, cube.meshCube);
-        faceModel = new Model("face-model", materialList, face.faceMesh);
+        cubeModel = new Model("cube", materialList, cube.mesh);
+        faceModel = new Model("face", materialList, face.mesh);
+        sphereModel = new Model("sphere", materialList, sphere.getMesh());
         scene.addModel(cubeModel);
         scene.addModel(faceModel);
+        scene.addModel(sphereModel);
 
     }
 
@@ -112,11 +123,11 @@ public class RenderHandler {
         List<Material> skyMaterialList = new ArrayList<>();
         skyMaterialList.add(skyMaterial);
 
-        List<Entity> skyboxList = new ArrayList<>();
+        List<Object> skyboxList = new ArrayList<>();
 
         skyboxList.add(skybox);
 
-        skyModel = new Model("sky-model", skyMaterialList, skyboxList, sky.skyCube);
+        skyModel = new Model("sky", skyMaterialList, skyboxList, sky.skyCube);
 
     }
 
@@ -129,50 +140,70 @@ public class RenderHandler {
         List<Material> fontList = new ArrayList<>();
         fontList.add(fontMaterial);
 
-        FPSCounter = new TextItem("", scene.getFontCache().getFont("src/main/resources/textures/fonts/ExportedFont.png"), 4, 8, 8, new Vector3f(-1.75f, 0.825f, -1.0f), new Vector3f(0, 0, 0), new Vector3f(0.5f, 0.5f, 0.5f));
+        FPSCounter = new TextItem("", new Vector3f(-1.75f, 0.825f, -1.0f), new Vector3f(0, 0, 0), new Vector3f(0.5f, 0.5f, 0.5f));
+        Xcoordinate = new TextItem("", new Vector3f(-1.75f, 0.75f, -1.0f), new Vector3f(0, 0, 0), new Vector3f(0.25f, 0.25f, 0.25f));
+        Ycoordinate = new TextItem("", new Vector3f(-1.0f, 0.75f, -1.0f), new Vector3f(0, 0, 0), new Vector3f(0.25f, 0.25f, 0.25f));
+        Zcoordinate = new TextItem("", new Vector3f(-0.25f, 0.75f, -1.0f), new Vector3f(0, 0, 0), new Vector3f(0.25f, 0.25f, 0.25f));
+        //loadingScreen = new TextItem("Loading", new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
 
         List<TextItem> textEntityList = new ArrayList<>();
 
         textEntityList.add(FPSCounter);
+        textEntityList.add(Xcoordinate);
+        textEntityList.add(Ycoordinate);
+        textEntityList.add(Zcoordinate);
+        //textEntityList.add(loadingScreen);
 
-        fontModel = new Model("font", fontList, FPSCounter.getMesh(), textEntityList);
+        fontModel = new Model("font", fontList, textEntityList);
 
     }
 
     public void initializeEntities() {
 
-        scene.addEntity(center);
-        scene.addEntity(orbit);
-        scene.addEntity(orbit2);
-        scene.addEntity(orbit3);
-        scene.addEntity(orbit4);
-        scene.addEntity(faceEntity);
+        scene.addObject(center);
+        //scene.addObject(orbit);
+        //scene.addObject(orbit2);
+        //scene.addObject(orbit3);
+        //scene.addObject(orbit4);
+        //scene.addObject(faceEntity);
+        //scene.addObject(cube_render);
+        //scene.addObject(cube_render2);
+        //scene.addObject(cube_render3);
+        //scene.addObject(circle);
+        system.createSystem(137653, scene);
 
     }
 
     public void updateMatrix() {
 
-        updateCube1();
-        updateCube2();
-        updateCube3();
-        updateOrbit();
-        spherePoints();
+        //updateCube1();
+        //updateCube2();
+        //updateCube3();
+        //updateOrbit();
+        //spherePoints();
 
     }
-
+/*
     public void updateCube1() {
 
         temp += 0.01f;
         temp2 += 0.001f;
 
-        //cube_render.updateXRotation((float) Math.sin(temp)*90);
-        //cube_render.updateZPosition((float) Math.sin(temp));
+        cube_render.updateXRotation((float) Math.sin(temp)*90);
+        cube_render.updateZPosition((float) Math.sin(temp));
 
     }
 
     public void updateCube2() {
 
         //cube_render2.updateXPosition(camera.getPosition().getX());
+        tempCubeAngle += 0.01f;
+        float tempCubeX = (float) Math.sin(tempCubeAngle) * 5f;
+        float tempCubeY = (float) Math.cos(tempCubeAngle) * 5f;
+        cube_render2.updateXPosition(tempCubeX);
+        cube_render2.updateYPosition(tempCubeY);
+        //System.out.println(cube_render2.getPosition().getX());
+
 
     }
 
@@ -257,6 +288,7 @@ public class RenderHandler {
 //        orbit4.updateYPosition(-0.5f);
 
     }
+*/
 
     public Model getTextModel() {
 
@@ -270,4 +302,9 @@ public class RenderHandler {
 
     }
 
+    public void createLoading() {
+
+
+
+    }
 }

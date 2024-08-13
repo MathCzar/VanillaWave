@@ -11,7 +11,8 @@ public class Camera {
     private final Matrix4f viewMatrix = new Matrix4f();
 
     private Vector3f position, rotation;
-    private float moveSpeed = 0.05f, mouseSensitivity = 0.15f;
+
+    public float moveSpeed = 0.05f, mouseSensitivity = 0.15f;
 
     private float newMouseX, newMouseY;
     private float oldMouseX, oldMouseY;
@@ -98,6 +99,14 @@ public class Camera {
 
         return viewMatrix;
 
+    }
+
+    public void setMoveSpeed(float moveSpeed) {
+        this.moveSpeed = moveSpeed;
+    }
+
+    public void setMouseSensitivity(float mouseSensitivity) {
+        this.mouseSensitivity = mouseSensitivity;
     }
 
 }

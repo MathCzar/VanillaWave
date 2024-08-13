@@ -1,13 +1,8 @@
 package VanillaWaveEngine.Rendering;
 
-import VanillaWaveEngine.Entity;
 import VanillaWaveEngine.Math.Vector2f;
 import VanillaWaveEngine.Math.Vector3f;
 import VanillaWaveEngine.Math.Vertex;
-
-import java.nio.charset.Charset;
-import java.sql.SQLOutput;
-import java.util.*;
 
 public class TextItem {
 
@@ -17,15 +12,7 @@ public class TextItem {
 
     private String text;
 
-    private final int numCols;
-
-    private final int numRows;
-
     private Mesh textMesh;
-
-    private Texture texture;
-
-    private int textureID;
 
     private Vertex[] vertices = new Vertex[] {};
     private Vertex[] textCoords = new Vertex[] {};
@@ -34,26 +21,22 @@ public class TextItem {
 
     private Vector3f position, rotation, scale;
 
-    public TextItem(String text, Texture texture, int textureID, int numCols, int numRows, Vector3f position, Vector3f rotation, Vector3f scale) {
+    public TextItem(String text, Vector3f position, Vector3f rotation, Vector3f scale) {
         this.text = text;
-        this.numCols = numCols;
-        this.numRows = numRows;
-        this.texture = texture;
-        this.textureID = textureID;
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
-        buildMesh(texture, numCols, numRows);
+        buildMesh();
     }
 
-    private void buildMesh(Texture texture, int numCols, int numRows) {
+    private void buildMesh() {
 
         //create/clean templates to add elements to the arrays
         vertices = new Vertex[] {};
         textCoords = new Vertex[] {};
         indices = new int[] {};
 
-        System.out.println("Frames: " + text);
+        //System.out.println("Frames: " + text);
 
         //Sends string to array to be processed
         char[] stringToChar = text.toCharArray();
@@ -74,8 +57,63 @@ public class TextItem {
             indices = addIntToArray(indices, (VERTICES_PER_QUAD * i));
 
             switch(stringToChar[i]) {
-                case '0':
+                case ' ':
+                    //Texture Coordinates
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.0f, 0.0f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.0f, 0.125f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.125f, 0.125f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.125f, 0.0f)));
+                    break;
 
+                case ':':
+                    //Texture Coordinates
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.25f, 0.5f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.25f, 0.375f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.375f, 0.375f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.375f, 0.5f)));
+                    break;
+
+                case '-':
+                    //Texture Coordinates
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.625f, 0.125f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.625f, 0.20f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.75f,  0.20f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.75f,  0.125f)));
+                    break;
+
+                case '.':
+                    //Texture Coordinates
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.75f, 0.125f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.75f, 0.25f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.875f, 0.25f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.875f, 0.125f)));
+                    break;
+
+                case 'X':
+                    //Texture Coordinates
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.0f, 1.0f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.0f, 0.875f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.125f, 0.875f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.125f, 1.0f)));
+                    break;
+
+                case 'Y':
+                    //Texture Coordinates
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.125f, 1.0f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.125f, 0.875f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.25f, 0.875f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.25f, 1.0f)));
+                    break;
+
+                case 'Z':
+                    //Texture Coordinates
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.25f, 1.0f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.25f, 0.875f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.375f, 0.875f)));
+                    textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.375f, 1.0f)));
+                    break;
+
+                case '0':
                     //Texture Coordinates
                     textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.0f, 0.375f)));
                     textCoords = addVectorToArray(textCoords, new Vertex(new Vector2f(0.0f, 0.25f)));
@@ -164,10 +202,11 @@ public class TextItem {
 //
         //}, new Vertex[] {
 //
-        //        //Front face
-        //        new Vertex(new Vector2f(0.0f, 0.375f)),
-        //        new Vertex(new Vector2f(0.0f, 0.25f)),new Vertex(new Vector2f(0.125f, 0.25f)),
-        //        new Vertex(new Vector2f(0.125f, 0.375f)),
+        //        //Front fac
+        //        new Vertex(new Vector2f(0.625f, 0.125f)),
+        //        new Vertex(new Vector2f(0.625f, 0.20f)),
+        //        new Vertex(new Vector2f(0.75f,  0.20f)),
+        //        new Vertex(new Vector2f(0.75f,  0.125f))
 //
 //
 //
@@ -196,19 +235,13 @@ public class TextItem {
 
     }
 
-    public Texture getTexture() {
-
-        return this.texture;
-
-    }
-
     public String getText() {
         return text;
     }
 
     public void setText(String text) {
         this.text = text;
-        buildMesh(texture, numCols, numRows);
+        buildMesh();
     }
 
     private Vertex[] addVectorToArray(Vertex[] newArray, Vertex elementToAdd) {
@@ -234,12 +267,6 @@ public class TextItem {
 
         destArray[destArray.length - 1] = elementToAdd;
         return destArray;
-
-    }
-
-    public int getTextureID() {
-
-        return textureID;
 
     }
 

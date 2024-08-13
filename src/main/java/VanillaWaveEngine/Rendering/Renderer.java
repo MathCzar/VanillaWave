@@ -2,11 +2,9 @@ package VanillaWaveEngine.Rendering;
 
 import VanillaWaveEngine.Camera;
 import VanillaWaveEngine.Math.Matrix4f;
-import VanillaWaveEngine.Entity;
+import VanillaWaveEngine.Object;
 import VanillaWaveEngine.Math.Vector3f;
-import VanillaWaveEngine.Rendering.AssetPool.FontCache;
-import VanillaWaveEngine.Rendering.AssetPool.SkyCache;
-import VanillaWaveEngine.Rendering.AssetPool.TextureCache;
+import VanillaWaveEngine.Rendering.AssetPool.*;
 import VanillaWaveEngine.Window;
 import org.lwjgl.opengl.*;
 
@@ -35,22 +33,26 @@ public class Renderer {
 
         for (Model model : models) {
 
-            List<Entity> entities = model.getEntitiesList();
+            List<Object> objects = model.getObjectList();
 
             for (Material material : model.getMaterialList()) {
 
-                for (Entity entity : entities) {
+                for (Object object : objects) {
 
                     GL30.glBindVertexArray(model.getMesh().getVAO());
                     GL30.glEnableVertexAttribArray(0);
                     GL30.glEnableVertexAttribArray(1);
                     GL30.glEnableVertexAttribArray(2);
                     GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, model.getMesh().getIBO());
-                    Texture texture = textureCache.getTexture(material.getTexturePath());
+                    Texture texture = textureCache.getTexture("src/main/resources/textures/materials/grassBlock.png");
+                    //System.out.println(object.getMaterialID());
+                    //System.out.println(texture.getTextureId());
+                    //System.out.println(material.getTexturePath());
                     GL13.glActiveTexture(GL13.GL_TEXTURE0);
-                    texture.bind(entity);
+                    texture.bind(object);
+                    //System.out.println("test");
                     shader.bind();
-                    shader.setUniform("model", Matrix4f.transform(entity.getPosition(), entity.getRotation(), entity.getScale()));
+                    shader.setUniform("model", Matrix4f.transform(object.getPosition(), object.getRotation(), object.getScale()));
                     shader.setUniform("view", Matrix4f.view(camera.getPosition(), camera.getRotation()));
                     shader.setUniform("projection", window.getProjectionMatrix());
                     GL11.glDrawElements(GL11.GL_TRIANGLES, model.getMesh().getIndices().length, GL11.GL_UNSIGNED_INT, 0);
@@ -122,11 +124,11 @@ public class Renderer {
 
         GL11.glEnable(GL_DEPTH_TEST);
 
-        List<Entity> sky = model.getSkyboxList();
+        List<Object> sky = model.getSkyboxList();
 
         for (Material material : model.getMaterialList()) {
 
-            for (Entity entity : sky) {
+            for (Object object : sky) {
 
                 GL30.glBindVertexArray(model.getMesh().getVAO());
                 GL30.glEnableVertexAttribArray(0);
@@ -135,9 +137,9 @@ public class Renderer {
                 GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, model.getMesh().getIBO());
                 Texture skyTex = skyCache.getSkybox(material.getTexturePath());
                 GL13.glActiveTexture(GL13.GL_TEXTURE0);
-                skyTex.bind(entity);
+                skyTex.bind(object);
                 shader.bind();
-                shader.setUniform("model", Matrix4f.transform(entity.getPosition(), entity.getRotation(), entity.getScale()));
+                shader.setUniform("model", Matrix4f.transform(object.getPosition(), object.getRotation(), object.getScale()));
                 shader.setUniform("view", Matrix4f.view(new Vector3f(0, 0, 0), camera.getRotation()));
                 shader.setUniform("projection", window.getProjectionMatrix());
                 GL11.glDrawElements(GL11.GL_TRIANGLES, model.getMesh().getIndices().length, GL11.GL_UNSIGNED_INT, 0);
