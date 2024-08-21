@@ -69,7 +69,7 @@ public class RenderHandler {
         cube.create();
         face.create();
         sky.create();
-        sphere.constructMesh(2);
+        sphere.constructMesh(1);
 
     }
 

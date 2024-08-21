@@ -15,38 +15,18 @@ public class CubeMesh {
 
     public Mesh mesh = new Mesh(new Vertex[] {
 
-            new Vertex(new Vector3f(-0.57735026f ,-0.57735026f ,0.57735026f )),new Vertex(new Vector3f(-0.6770032f ,-0.28867513f ,0.6770032f )),
-            new Vertex(new Vector3f(-0.28867513f ,-0.6770032f ,0.6770032f )),new Vertex(new Vector3f(-0.3385016f ,-0.3385016f ,0.8779711f )),
-            new Vertex(new Vector3f(0.0f ,-0.70710677f ,0.70710677f )),new Vertex(new Vector3f(0.0f ,-0.35355338f ,0.9354144f )),
-            new Vertex(new Vector3f(0.28867513f ,-0.6770032f ,0.6770032f )),new Vertex(new Vector3f(0.3385016f ,-0.3385016f ,0.8779711f )),
-            new Vertex(new Vector3f(0.57735026f ,-0.57735026f ,0.57735026f )), new Vertex(new Vector3f(0.6770032f ,-0.28867513f ,0.6770032f )),
+            //Back face
+            new Vertex(new Vector3f(-0.5f,  0.5f, -0.5f)),
 
+            new Vertex(new Vector3f(-0.5f,  0.0f, -0.5f)),
+            new Vertex(new Vector3f(0.0f,  0.0f, -0.5f)),
+            new Vertex(new Vector3f(0.0f,  0.5f, -0.5f)),
 
-
-
-
-
-
-            new Vertex(new Vector3f(-0.70710677f ,0.0f ,0.70710677f )),new Vertex(new Vector3f(-0.6770032f ,0.28867513f ,0.6770032f )),
-            new Vertex(new Vector3f(-0.35355338f ,0.0f ,0.9354144f )),new Vertex(new Vector3f(-0.3385016f ,0.3385016f ,0.8779711f )),
-            new Vertex(new Vector3f(0.0f ,0.0f ,1.0f )),new Vertex(new Vector3f(0.0f ,0.35355338f ,0.9354144f )),
-            new Vertex(new Vector3f(0.35355338f ,0.0f ,0.9354144f )),new Vertex(new Vector3f(0.3385016f ,0.3385016f ,0.8779711f )),
-            new Vertex(new Vector3f(0.70710677f ,0.0f ,0.70710677f )),new Vertex(new Vector3f(0.6770032f ,0.28867513f ,0.6770032f )),
-
-
-
-
-
-
-
-            new Vertex(new Vector3f(-0.57735026f ,0.57735026f ,0.57735026f )),
-            new Vertex(new Vector3f(-0.28867513f ,0.6770032f ,0.6770032f )),
-            new Vertex(new Vector3f(0.0f ,0.70710677f ,0.70710677f )),
-            new Vertex(new Vector3f(0.28867513f ,0.6770032f ,0.6770032f )),
-            new Vertex(new Vector3f(0.57735026f ,0.57735026f ,0.57735026f )),
-
-
-
+            new Vertex(new Vector3f(-0.5f, -0.5f, -0.5f)),
+            new Vertex(new Vector3f(0.0f, -0.5f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f,  -0.5f, -0.5f)),
+            new Vertex(new Vector3f(0.5f,  0.0f, -0.5f)),
+            new Vertex(new Vector3f( 0.5f, 0.5f, -0.5f)),
 
     }, new Vertex[] {
 
@@ -54,7 +34,14 @@ public class CubeMesh {
             new Vertex(new Vector2f(0.0f, 0.0f)),
             new Vertex(new Vector2f(0.0f, 1.0f)),
             new Vertex(new Vector2f(1.0f, 1.0f)),
-            new Vertex(new Vector2f(1.0f, 0.0f))
+            new Vertex(new Vector2f(1.0f, 0.0f)),
+
+            new Vertex(new Vector2f(0.0f, 0.0f)),
+            new Vertex(new Vector2f(0.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 1.0f)),
+            new Vertex(new Vector2f(1.0f, 0.0f)),
+
+
 
     },
     new float[] {
@@ -64,46 +51,18 @@ public class CubeMesh {
     },
     new int[] {
 
-            0,
-            1,
-            2,
-            1,
-            2,
-            3,
-            2,
-            3,
-            4,
+            //Back face
+            0, 3, 1,
+            1, 2, 3,
 
-            3,
-            4,
-            5,
-            4,
-            5,
-            6,
+            2, 7, 5,
+            5, 6, 7,
 
-            5,
-            6,
-            7,
-            6,
-            7,
-            8,
-            7,
-            8,
-            9,
-
-            10,
-            11,
-            12,
-            11,
-            12,
-            13,
-            12,
-            13,
-            14,
-            13,
-            14,
-            15,
-
+            //3, 4, 6,
+            //6, 7, 4,
+//
+            //4, 5, 7,
+            //7, 8, 5
 
     });
 
