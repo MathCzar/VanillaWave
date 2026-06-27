@@ -6,6 +6,7 @@ public class KeyboardListener {
 
     private static KeyboardListener instance;
     private boolean keyPressed [] = new boolean[350];
+    private static int numTimes;
 
     public static KeyboardListener get() {
 
@@ -25,7 +26,7 @@ public class KeyboardListener {
         // Checks if a button on the mouse is pressed
         if (action == GLFW_PRESS) {
 
-            // Checks if a button on the mouse is one of the 3 standard buttons
+            // Checks if a button on the mouse is one of the standard keyboard buttons
             if (key < get().keyPressed.length) {
 
                 get().keyPressed[key] = true;
@@ -36,10 +37,12 @@ public class KeyboardListener {
         // Checks if a button on the mouse is released
         else if (action == GLFW_RELEASE) {
 
-            // Checks if a button on the mouse is one of the 3 standard buttons
+            // Checks if a button on the mouse is one of the standard keyboard buttons
             if (key < get().keyPressed.length) {
 
                 get().keyPressed[key] = false;
+
+                numTimes = 0;
 
             }
 
@@ -50,6 +53,34 @@ public class KeyboardListener {
     public static boolean isKeyPressed(int keyNum) {
 
         if (keyNum < get().keyPressed.length) {
+
+            return get().keyPressed[keyNum];
+
+        }
+        else {
+
+            throw new IllegalStateException("Key pressed out of bounds");
+
+        }
+
+    }
+
+    public static boolean isKeyPressed(int keyNum, boolean toggleable) {
+
+        if (keyNum < get().keyPressed.length) {
+
+            if (get().keyPressed[keyNum] && toggleable) {
+
+                if (numTimes > 0) {
+
+                    return false;
+
+                }
+                numTimes++;
+
+                return true;
+
+            }
 
             return get().keyPressed[keyNum];
 

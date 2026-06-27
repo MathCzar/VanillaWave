@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class RenderHandler {
 
-    public Camera camera = new Camera(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 0.0f, 0.0f));
+    public Camera camera = new Camera(new Vector3f(0.0f, 10.0f, 0.0f), new Vector3f(0.0f, 0.0f, 0.0f));
 
     CubeMesh cube = new CubeMesh();
     FaceMesh face = new FaceMesh();

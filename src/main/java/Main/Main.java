@@ -6,8 +6,10 @@ import VanillaWaveEngine.Rendering.*;
 import VanillaWaveEngine.Sound.*;
 import org.lwjgl.openal.AL11;
 
+import java.io.*;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -19,6 +21,8 @@ public class Main implements Runnable {
 
     public int width = 1920, height = 1080;
     public String title = "Window Thing";
+
+    public HashMap<String, String> arrOptions = new HashMap<>();
 
     private Scene scene;
 
@@ -53,6 +57,9 @@ public class Main implements Runnable {
     }
 
     private void init() {
+
+        // Initialize options
+        generateArrOptions();
 
         // Create the window
         windowObject = get();
@@ -92,9 +99,11 @@ public class Main implements Runnable {
 
     private void loop() {
 
-        // Run the rendering loop until the user has attempted to close
-        // the window or has pressed the ESCAPE key.
+        // Run the rendering loop until the user has attempted to close the window or has pressed the ESCAPE key.
         while ( !glfwWindowShouldClose(windowObject.window) ) {
+
+            // Updates the position of the camera everytime the while loop is run
+            render.camera.update();
 
             // Updates the window
             windowObject.loop();
@@ -112,9 +121,6 @@ public class Main implements Runnable {
             // Updates the object position and rotation
             render.updateMatrix();
 
-            // Updates the position of the camera everytime the while loop is run
-            render.camera.update();
-
             // Renders the square created in the mesh
             render();
 
@@ -127,7 +133,7 @@ public class Main implements Runnable {
         // Makes sure there is only one window created
         if(windowObject == null) {
 
-            windowObject = new Window(width, height, title, "src/main/resources/textures/ERROR.png", this);
+            windowObject = new Window(Integer.parseInt(arrOptions.get("width")), Integer.parseInt(arrOptions.get("height")), arrOptions.get("title"), "src/main/resources/textures/ERROR.png", this);
             windowObject.init();
 
         }
@@ -174,5 +180,56 @@ public class Main implements Runnable {
         //source.play();
     }
 
+    private void generateArrOptions() {
+
+        // Default window configuration
+        arrOptions.put("width", Integer.toString(width));
+        arrOptions.put("height", Integer.toString(height));
+        arrOptions.put("title", title);
+
+        try {
+            File options = new File("src/main/resources/options.txt");
+
+            if (options.createNewFile()) { // Create a new file if no file exists
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(options))) {
+
+                    writer.write("width: " + width + "\n");
+                    writer.write("height: " + height + "\n");
+                    writer.write("title: " + title + "\n");
+
+                }catch (IOException e) {
+
+                    System.out.println("Could not write to options.txt.");
+
+                }
+
+            }
+            else { // If the file already exists, get all options
+
+                BufferedReader reader = new BufferedReader(new FileReader(options));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+
+                    String[] arrLine = line.split(":");
+                    arrOptions.put(arrLine[0], arrLine[1].trim());
+
+                }
+
+            }
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+            System.out.println("Error creating options.txt.");
+
+        }
+
+    }
+
+    public HashMap<String, String> getArrOptions() {
+        return arrOptions;
+    }
 
 }

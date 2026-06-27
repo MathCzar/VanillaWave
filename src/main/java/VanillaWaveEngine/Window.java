@@ -1,14 +1,14 @@
 package VanillaWaveEngine;
 
 import java.io.File;
-import java.lang.Thread;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.HashMap;
 
+import VanillaWaveEngine.Input.KeybindHandler;
 import VanillaWaveEngine.Input.KeyboardListener;
 import VanillaWaveEngine.Input.MouseListener;
 import VanillaWaveEngine.Math.Matrix4f;
-import VanillaWaveEngine.Rendering.Shader;
 
 import org.lwjgl.Version;
 import org.lwjgl.glfw.*;
@@ -24,36 +24,35 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
 
-    private final int windowWidth, windowHeight;
-    private int width, height;
+    private int windowWidth, windowHeight;
     private final String title, windowIcon;
-    private boolean isFullscreen, playing, hasResized;
+    private boolean isFullscreen, hasResized;
     public static long window;
 
     private final Main.Main main;
 
     private final float red, green, blue, alpha;
 
-    private final Matrix4f projection;
-
-    //private long audioDevice, audioContext;
-
-    //Shader shader = new Shader("/resources/shaders/mainVertex.glsl", "/resources/shaders/mainFragment.glsl");
+    private Matrix4f projection;
 
     public int frames, finalFrames;
     public double frameLimit = 144.0;
     public long time;
 
+    KeybindHandler keybindHandler;
+    HashMap<String, Integer> defaultKeybinds = new HashMap<>();
+
+
+    boolean pT = true;
+
     public Window(int width, int height, String title, String windowIcon, Main.Main main) {
 
-        // Get LWJGL 3 Version
+        // Get LWJGL Version
         System.out.println("The current version of LWJGL is " + Version.getVersion());
 
         // Sets the size of the start-up window
         this.windowWidth = width;
         this.windowHeight = height;
-        this.width = width;
-        this.height = height;
 
         // Sets the title of the window
         this.title = title;
@@ -61,7 +60,7 @@ public class Window {
         // Set the icon's image path
         this.windowIcon = windowIcon;
 
-        // Sets the final class
+        // Sets the main class
         this.main = main;
 
         // Sets the rgba of the screen background
@@ -71,10 +70,9 @@ public class Window {
         alpha = 1f;
 
         this.isFullscreen = true;
-        this.playing = false;
 
         // Set up projection matrix
-        projection = Matrix4f.projection(90.0f, (float) 1920 / (float) 1080, 0.01f, 100000.0f);
+        projection = setProjectionMatrix(90.0f, (float) windowWidth, (float) windowHeight, 0.01f, 100000.0f);
 
     }
 
@@ -97,6 +95,18 @@ public class Window {
     }
 
     public void init() {
+
+        defaultKeybinds.put("left", GLFW_KEY_A);
+        defaultKeybinds.put("right", GLFW_KEY_D);
+        defaultKeybinds.put("forward", GLFW_KEY_W);
+        defaultKeybinds.put("backward", GLFW_KEY_S);
+        defaultKeybinds.put("up", GLFW_KEY_SPACE);
+        defaultKeybinds.put("down", GLFW_KEY_LEFT_SHIFT);
+        defaultKeybinds.put("quit", GLFW_KEY_ESCAPE);
+        defaultKeybinds.put("focus mouse", GLFW_KEY_DELETE);
+        defaultKeybinds.put("play sound", GLFW_KEY_P);
+
+        keybindHandler = new KeybindHandler(defaultKeybinds);
 
         // Setup an error callback.
         GLFWErrorCallback.createPrint(System.err).set();
@@ -123,12 +133,12 @@ public class Window {
             glfwGetWindowSize(window, pWidth, pHeight);
 
             // Get the resolution of the primary monitor
-            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+            GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
             // Sets the position of the window to the middle of the screen
             glfwSetWindowPos(window,
-                    (vidmode.width() - pWidth.get(0)) / 4,
-                    (vidmode.height() - pHeight.get(0)) / 4);
+                    (vidMode.width() - pWidth.get(0)) / 4,
+                    (vidMode.height() - pHeight.get(0)) / 4);
 
         }
 
@@ -148,20 +158,16 @@ public class Window {
         time = System.currentTimeMillis();
 
         // Enable v-sync
-        glfwSwapInterval(1);
+        glfwSwapInterval(GLFW_TRUE);
 
         // Make the window visible
         glfwShowWindow(window);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
 
-            // Check to see if the file exists
-            //FileUtilities.loadAsString(windowIcon);
-
             // Get the absolute path to find the resource file
             File file = new File(windowIcon);
             String absolutePath = file.getAbsolutePath();
-            //System.out.println(absolutePath);
 
             // Allocate memory to image
             IntBuffer w = stack.mallocInt(1);
@@ -177,18 +183,10 @@ public class Window {
             // Create the image and the buffer
             GLFWImage iconImage = GLFWImage.malloc();
             GLFWImage.Buffer iconBuffer = GLFWImage.malloc(1);
-
-            // Set the image
-            iconImage.set(w.get(), h.get(), image);
-
-            // Set the buffer
-            iconBuffer.put(0, iconImage);
-
-            // Set the icon
-            glfwSetWindowIcon(window, iconBuffer);
-
-            // Free up the image
-            stbi_image_free(image);
+            iconImage.set(w.get(), h.get(), image); // Set the image
+            iconBuffer.put(0, iconImage); // Set the buffer
+            glfwSetWindowIcon(window, iconBuffer); // Set the icon
+            stbi_image_free(image); // Free up the image
 
         }
 
@@ -225,7 +223,7 @@ public class Window {
 
     public void loop() {
 
-        // Measure speed
+        // Measure FPS
         frames++;
         if (System.currentTimeMillis() > time + 1000) {
 
@@ -241,8 +239,11 @@ public class Window {
         // clear the framebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Call on keybinds
+
+
         // Destroys the window and terminates the program without an error
-        if (KeyboardListener.isKeyPressed(GLFW_KEY_ESCAPE)) {
+        if (KeyboardListener.isKeyPressed(keybindHandler.getKeybinds().get("quit"))) {
 
             main.skyShader.destroy();
             main.txtShader.destroy();
@@ -260,109 +261,52 @@ public class Window {
 
         if (KeyboardListener.isKeyPressed(GLFW_KEY_P)) {
 
-            main.playerSoundSource.play();
+            projection = pT ? setProjectionMatrix(90.0f, (float) 10, (float) 5, 0.01f, 100000.0f) : setProjectionMatrix(90.0f, (float) 4, (float) 3, 0.01f, 100000.0f);
 
-        }
-
-        // If it is not fullscreen and has resized, change the viewport so the player can see the screen they resized to
-        if (hasResized && !isFullscreen) {
-
-            glViewport(0, 0, this.width, this.height);
-
-            hasResized = false;
-
+            pT = !pT;
         }
 
         // Makes the window toggleable to be fullscreen or not
-        if (KeyboardListener.isKeyPressed(GLFW_KEY_F11)) {
+        if (KeyboardListener.isKeyPressed(GLFW_KEY_F11, true)) {
 
             // Set the window's position, scale, and refresh rate
             glfwSetWindowMonitor(
                     (window),
                     (isFullscreen ? NULL : glfwGetPrimaryMonitor()),
-                    (isFullscreen ? this.windowWidth /4 : 0),
-                    (isFullscreen ? this.windowHeight/4 : 0),
-                    (isFullscreen ? this.windowWidth /2 : this.windowWidth),
-                    (isFullscreen ? this.windowHeight/2 : this.windowHeight),
+                    (isFullscreen ? this.windowWidth / 4 : 0),
+                    (isFullscreen ? this.windowHeight / 4 : 0),
+                    (isFullscreen ? this.windowWidth / 2 : this.windowWidth),
+                    (isFullscreen ? this.windowHeight / 2 : this.windowHeight),
                     (GLFW_DONT_CARE));
 
-            //glfwSetWindowSize(window, (isFullscreen ? this.windowWidth /2 : this.windowWidth), (isFullscreen ? this.windowHeight/2 : this.windowHeight));
-
             // Sets the view of the window
-            glViewport((isFullscreen ? this.windowWidth/4 : 0),
-                    (isFullscreen ? this.windowHeight/4 : 0),
-                    (isFullscreen ? this.windowWidth/2 : this.windowWidth),
-                    (isFullscreen ? this.windowHeight/2 : this.windowHeight));
+            glViewport((isFullscreen ? this.windowWidth / 4 : 0),
+                    (isFullscreen ? this.windowHeight / 4 : 0),
+                    (isFullscreen ? this.windowWidth / 2 : this.windowWidth),
+                    (isFullscreen ? this.windowHeight / 2 : this.windowHeight));
 
-            isFullscreen = isFullscreen ? false : true;
+            glfwWindowHint(GLFW_MAXIMIZED, isFullscreen ? GLFW_FALSE : GLFW_TRUE);
 
-            //if (isFullscreen) {
 
-                //isFullscreen = false;
-
-            //}
-            //else if (!isFullscreen) {
-
-                //isFullscreen = true;
-
-            //}
-            //else {
-
-                //throw new RuntimeException("The window variable is neither true nor false");
-
-            //}
-
-            // Makes the thread sleep to prevent the fullscreen bugging out
-            try {
-                Thread.sleep(500);
-            }
-            catch (InterruptedException ex){
-
-                throw new RuntimeException("The thread could not sleep");
-
-            }
-
-        }
-
-        //glfwSetWindowSizeCallback(window, GLFW);
-
-        //if (isFullscreen) {
-
-            //double lastTime = glfwGetTime();
-            //while (glfwGetTime() < lastTime + 1.0/frameLimit) {
-
-            //}
-        //}
-
-        if (KeyboardListener.isKeyPressed(GLFW_KEY_DELETE)) {
-            if (!playing) {
-                playing = true;
-            }
-            else {
-                playing = false;
-            }
-        }
-
-        if (KeyboardListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
-
-            main.render.camera.setMoveSpeed(1.0f);
-
-        }
-        else if (!KeyboardListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
-
-            main.render.camera.setMoveSpeed(0.05f);
+            isFullscreen = !isFullscreen;
 
         }
 
         // Toggleable mouse lock
-        if (playing) {
+        if (KeyboardListener.isKeyPressed(GLFW_KEY_DELETE, true)) {
 
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetInputMode(window, GLFW_CURSOR, glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 
         }
-        else {
 
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        main.render.camera.moveSpeed = KeyboardListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL) ? 1.0f : 0.05f;
+
+        // If the window has resized, change the viewport so the player can see the screen they resized to
+        if (hasResized) {
+
+            glViewport(0, 0, this.windowWidth, this.windowHeight);
+
+            hasResized = false;
 
         }
 
@@ -403,6 +347,12 @@ public class Window {
 
     }
 
+    public Matrix4f setProjectionMatrix(float fov, float aspectWidth, float aspectHeight, float near, float far) {
+
+        return Matrix4f.projection(fov, aspectWidth / aspectHeight, near, far);
+
+    }
+
     public static void swapBuffer() {
 
         // Refresh positions
@@ -413,8 +363,8 @@ public class Window {
     public void terminate() {
 
         // Free the window callbacks and destroy the window
-        glfwFreeCallbacks(main.windowObject.window);
-        glfwDestroyWindow(main.windowObject.window);
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
 
         // Destroy audio context
         //alcDestroyContext(audioContext);
@@ -426,12 +376,6 @@ public class Window {
 
     }
 
-    public int getFrames() {
-
-        return finalFrames;
-
-    }
-
     private void setLocalCallbacks() {
 
         //Checks to see if the window was resized
@@ -439,14 +383,26 @@ public class Window {
             @Override
             public void invoke(long window, int callWidth, int callHeight) {
 
-                width = callWidth;
-                height = callHeight;
+                windowWidth = callWidth;
+                windowHeight = callHeight;
                 hasResized = true;
 
             }
         };
 
         glfwSetWindowSizeCallback(window, windowSizeCallback);
+
+    }
+
+    public int getFrames() {
+
+        return finalFrames;
+
+    }
+
+    public long getTime() {
+
+        return time;
 
     }
 

@@ -12,7 +12,7 @@ public class Camera {
 
     private Vector3f position, rotation;
 
-    public float moveSpeed = 0.05f, mouseSensitivity = 0.15f;
+    public float moveSpeed = 0.05f, mouseSensitivity = 0.15f, gravity = 1.001f, velY = 0;
 
     private float newMouseX, newMouseY;
     private float oldMouseX, oldMouseY;
@@ -26,6 +26,24 @@ public class Camera {
 
         newMouseX = MouseListener.getX();
         newMouseY = MouseListener.getY();
+
+        if (getPosition().getY() > 0) {
+
+            if (velY == 0){
+
+                velY = 0.001f;
+
+            }
+            else if (velY < 1000) {
+
+                velY = velY * gravity;
+
+            }
+            System.out.println(velY);
+
+            position = Vector3f.add(position, new Vector3f(0, -velY, 0));
+
+        }
 
         float x = (float) Math.sin(Math.toRadians(rotation.getY())) * moveSpeed;
         float z = (float) Math.cos(Math.toRadians(rotation.getY())) * moveSpeed;

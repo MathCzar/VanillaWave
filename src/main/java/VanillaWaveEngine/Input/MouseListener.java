@@ -9,6 +9,7 @@ public class MouseListener {
     private double xPos, yPos, lastX, lastY;
     private boolean mouseButtonPressed [] = new boolean[3];
     private boolean isDragging;
+    private static int numTimes;
 
     private MouseListener() {
 
@@ -74,6 +75,8 @@ public class MouseListener {
 
                 get().mouseButtonPressed[button] = false;
                 get().isDragging = false;
+
+                numTimes = 0;
 
             }
             else {
@@ -154,6 +157,34 @@ public class MouseListener {
     public static boolean buttonPressedDown(int button) {
 
         if (button < get().mouseButtonPressed.length) {
+
+            return get().mouseButtonPressed[button];
+
+        }
+        else {
+
+            return false;
+
+        }
+
+    }
+
+    public static boolean buttonPressedDown(int button, boolean toggleable) {
+
+        if (button < get().mouseButtonPressed.length) {
+
+            if (get().mouseButtonPressed[button] && toggleable) {
+
+                if (numTimes > 0) {
+
+                    return false;
+
+                }
+                numTimes++;
+
+                return true;
+
+            }
 
             return get().mouseButtonPressed[button];
 
